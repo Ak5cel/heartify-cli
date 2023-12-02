@@ -1,0 +1,25 @@
+{
+  "name": "heartify-spotify",
+  "version": "1.0.0",
+  "description": "A Spotify Liked songs manager that runs in the terminal",
+  "main": "index.js",
+  "bin": {
+    "heartify": "./index.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "test-debug": "DEBUG=nock.* jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nock": "^13.3.8"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "commander": "^11.1.0",
+    "express": "^4.18.2"
+  }
+}
