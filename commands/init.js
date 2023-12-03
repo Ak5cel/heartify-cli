@@ -13,15 +13,26 @@ exports.init = async () => {
   console.log(authURL);
 
   const tempServer = http.createServer(app);
-  tempServer.listen(9090, () => {
-    console.log("Listening...");
-  });
+  tempServer.listen(9090);
   const { code, state, error } = await listenForAuthCode(app);
-
-  // console.log(code, "<-- auth code received!!");
-  // console.log(state, "<-- state code received!!");
 
   tempServer.close();
 
-  console.log("You can now safely close the browser tab/window...");
+  if (!state || state !== process.env.SPOTIFY_CLIENT_STATE) {
+    console.log(
+      "Error: there seems to be a state mismatch. This could happen if the link expires, or if Spotify encounters an error. Please try again later."
+    );
+    return;
+  } else if (error) {
+    console.log("Hmm.. something's gone wrong");
+    console.log(`ERROR: ${error}`);
+    console.log(
+      "We received an error from Spotify. This happens if the user declines permissions or if Spotify encounters an error. Please try again later."
+    );
+    return;
+  }
+
+  console.log(
+    "\nReceived permissions, you can now safely close the browser tab/window..."
+  );
 };

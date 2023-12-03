@@ -54,13 +54,14 @@ describe("listenForAuthCode()", () => {
   test("should listen for a GET request to the callback and resolve with the code and state in the query parameters", async () => {
     const testApp = require("../../app");
     const testServer = http.createServer(testApp);
-    testServer.listen(9090);
+    testServer.listen();
+    const port = testServer.address().port;
 
     process.nextTick(() => {
       // simulate a delayed GET request to the callback with auth code and state
       // once the tempServer is up and listening,
       // (delay for the time until user clicks 'Accept')
-      const _ = axios.get(config.redirect_uri, {
+      const _ = axios.get(`http://localhost:${port}/callback`, {
         params: { state: "testState", code: "testCode" },
       });
     });

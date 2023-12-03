@@ -33,8 +33,9 @@ exports.listenForAuthCode = (app) => {
     app.get("/callback", (req, res, next) => {
       const code = req.query.code;
       const state = req.query.state;
+      const error = req.query.error;
 
-      resolve({ code, state });
+      resolve({ code, state, error });
       res.status(200).send();
     });
   });
