@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "jest",
-    "test-debug": "DEBUG=nock.* jest"
+    "test-debug": "DEBUG=nock.* jest",
+    "test-cov": "jest --coverage"
   },
   "keywords": [],
   "author": "",
