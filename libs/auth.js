@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const QueryString = require("qs");
 const { base64Encode, sha256 } = require("../utils/encoders");
 const globals = require("../config/globals");
+const userTokenStore = require("../config/userTokenStore");
 const { default: axios } = require("axios");
 
 exports.generateSpotifyAuthURL = () => {
@@ -45,7 +46,7 @@ exports.listenForAuthCode = (app) => {
 exports.exchangeCodeForTokens = (authCode) => {
   const endpoint = "https://accounts.spotify.com/api/token";
 
-  const postData = {
+  const postBody = {
     grant_type: "authorization_code",
     code: authCode,
     client_id: globals.SPOTIFY_CLIENT_ID,
@@ -59,7 +60,7 @@ exports.exchangeCodeForTokens = (authCode) => {
     },
   };
 
-  return axios.post(endpoint, postData, postConfig).then((response) => {
+  return axios.post(endpoint, postBody, postConfig).then((response) => {
     const { access_token, refresh_token, expires_in } = response.data;
 
     const validUntil = Date.now() + expires_in * 1000;
@@ -70,4 +71,41 @@ exports.exchangeCodeForTokens = (authCode) => {
       validUntil,
     };
   });
+};
+
+exports.refreshTokens = async () => {
+  const endpoint = "https://accounts.spotify.com/api/token";
+
+  const refreshToken = await userTokenStore.getRefreshToken();
+
+  const postBody = {
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+    client_id: globals.SPOTIFY_CLIENT_ID,
+  };
+
+  const postConfig = {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  };
+
+  return axios.post(endpoint, postBody, postConfig).then((response) => {
+    const { access_token, refresh_token, expires_in } = response.data;
+
+    const validUntil = Date.now() + expires_in * 1000;
+
+    return {
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      validUntil,
+    };
+  });
+};
+
+exports.checkIsValidToken = async () => {
+  const validUntil = await userTokenStore.getValidUntil();
+  const now = Date.now();
+
+  return validUntil > now;
 };
