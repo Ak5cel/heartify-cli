@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const QueryString = require("qs");
 const { base64Encode, sha256 } = require("../utils/encoders");
-const config = require("../config");
+const globals = require("../config/globals");
 const { default: axios } = require("axios");
 
 exports.generateSpotifyAuthURL = () => {
@@ -16,11 +16,11 @@ exports.generateSpotifyAuthURL = () => {
   process.env.SPOTIFY_CLIENT_STATE = state;
 
   const params = {
-    client_id: config.SPOTIFY_CLIENT_ID,
+    client_id: globals.SPOTIFY_CLIENT_ID,
     response_type: "code",
-    redirect_uri: config.redirect_uri,
+    redirect_uri: globals.redirect_uri,
     state: state,
-    scope: config.scopes.join(" "),
+    scope: globals.scopes.join(" "),
     code_challenge_method: "S256",
     code_challenge: codeChallenge,
   };
@@ -48,8 +48,8 @@ exports.exchangeCodeForTokens = (authCode) => {
   const postData = {
     grant_type: "authorization_code",
     code: authCode,
-    client_id: config.SPOTIFY_CLIENT_ID,
-    redirect_uri: config.redirect_uri,
+    client_id: globals.SPOTIFY_CLIENT_ID,
+    redirect_uri: globals.redirect_uri,
     code_verifier: process.env.CODE_VERIFIER,
   };
 

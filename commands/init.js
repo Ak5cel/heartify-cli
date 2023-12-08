@@ -4,8 +4,8 @@ const {
   listenForAuthCode,
   exchangeCodeForTokens,
 } = require("../libs/auth");
-const userTokenStore = require("../initUserTokenStore");
-const app = require("../app");
+const userTokenStore = require("../config/userTokenStore");
+const app = require("../config/app");
 
 exports.init = async () => {
   console.log("Hello! Welcome to heartify 💜");

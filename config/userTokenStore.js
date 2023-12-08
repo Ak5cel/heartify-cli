@@ -1,4 +1,4 @@
-const UserTokenStore = require("./libs/UserTokenStore");
+const UserTokenStore = require("../libs/UserTokenStore");
 
 const userTokenStore = new UserTokenStore();
 

@@ -1,5 +1,5 @@
 const { generateSpotifyAuthURL, listenForAuthCode } = require("../auth");
-const config = require("../../config");
+const globals = require("../../config/globals");
 const http = require("http");
 const { default: axios } = require("axios");
 
@@ -34,15 +34,15 @@ describe("generateSpotifyAuthURL()", () => {
 
     const params = url.searchParams;
 
-    expect(params.get("client_id")).toBe(config.SPOTIFY_CLIENT_ID);
+    expect(params.get("client_id")).toBe(globals.SPOTIFY_CLIENT_ID);
     expect(params.get("response_type")).toBe("code");
-    expect(params.get("redirect_uri")).toBe(config.redirect_uri);
+    expect(params.get("redirect_uri")).toBe(globals.redirect_uri);
 
     expect(params.get("state")).toEqual(expect.any(String));
     expect(params.get("state")).toBeTruthy();
     expect(params.get("state")).toBe(process.env.SPOTIFY_CLIENT_STATE);
 
-    expect(params.get("scope")).toBe(config.scopes.join(" "));
+    expect(params.get("scope")).toBe(globals.scopes.join(" "));
 
     expect(params.get("code_challenge_method")).toBe("S256");
     expect(params.get("code_challenge")).toEqual(expect.any(String));
@@ -52,7 +52,7 @@ describe("generateSpotifyAuthURL()", () => {
 
 describe("listenForAuthCode()", () => {
   test("should listen for a GET request to the callback and resolve with the code and state in the query parameters", async () => {
-    const testApp = require("../../app");
+    const testApp = require("../../config/app");
     const testServer = http.createServer(testApp);
     testServer.listen();
     const port = testServer.address().port;
