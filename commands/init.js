@@ -1,5 +1,10 @@
 const http = require("http");
-const { generateSpotifyAuthURL, listenForAuthCode } = require("../libs/auth");
+const {
+  generateSpotifyAuthURL,
+  listenForAuthCode,
+  exchangeCodeForTokens,
+} = require("../libs/auth");
+const userTokenStore = require("../initUserTokenStore");
 const app = require("../app");
 
 exports.init = async () => {
@@ -35,4 +40,9 @@ exports.init = async () => {
   console.log(
     "\nReceived permissions, you can now safely close the browser tab/window..."
   );
+
+  const tokens = await exchangeCodeForTokens(code);
+  userTokenStore.setTokens(tokens);
+
+  console.log("Set Access Tokens!!");
 };

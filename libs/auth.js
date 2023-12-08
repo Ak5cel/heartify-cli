@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const QueryString = require("qs");
 const { base64Encode, sha256 } = require("../utils/encoders");
 const config = require("../config");
+const { default: axios } = require("axios");
 
 exports.generateSpotifyAuthURL = () => {
   const baseURL = "https://accounts.spotify.com/authorize";
@@ -38,5 +39,35 @@ exports.listenForAuthCode = (app) => {
       resolve({ code, state, error });
       res.status(200).send();
     });
+  });
+};
+
+exports.exchangeCodeForTokens = (authCode) => {
+  const endpoint = "https://accounts.spotify.com/api/token";
+
+  const postData = {
+    grant_type: "authorization_code",
+    code: authCode,
+    client_id: config.SPOTIFY_CLIENT_ID,
+    redirect_uri: config.redirect_uri,
+    code_verifier: process.env.CODE_VERIFIER,
+  };
+
+  const postConfig = {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  };
+
+  return axios.post(endpoint, postData, postConfig).then((response) => {
+    const { access_token, refresh_token, expires_in } = response.data;
+
+    const validUntil = Date.now() + expires_in * 1000;
+
+    return {
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      validUntil,
+    };
   });
 };

@@ -1,8 +1,9 @@
 # Dependency directories
 node_modules/
 
-# dotenv environment variable files
+# secrets and dotenv environment variable files
 .env
+_userTokens.json
 
 # testing and coverage
 coverage/
