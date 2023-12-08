@@ -41,8 +41,10 @@ exports.init = async () => {
     "\nReceived permissions, you can now safely close the browser tab/window..."
   );
 
+  console.log("Completing authentication...");
+
   const tokens = await exchangeCodeForTokens(code);
   userTokenStore.setTokens(tokens);
 
-  console.log("Set Access Tokens!!");
+  console.log("Done.");
 };
