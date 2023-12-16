@@ -7,3 +7,6 @@ _userTokens.json
 
 # testing and coverage
 coverage/
+
+# seed data for testing
+_data.json
