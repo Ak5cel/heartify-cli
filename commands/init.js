@@ -6,6 +6,7 @@ const {
 } = require("../libs/auth");
 const userTokenStore = require("../config/userTokenStore");
 const app = require("../config/app");
+const { setupDB } = require("../config/setup-db");
 
 exports.init = async () => {
   console.log("Hello! Welcome to heartify 💜");
@@ -45,6 +46,11 @@ exports.init = async () => {
 
   const tokens = await exchangeCodeForTokens(code);
   userTokenStore.setTokens(tokens);
+
+  console.log("Done.");
+
+  console.log("Initialising local database...");
+  setupDB();
 
   console.log("Done.");
 };
