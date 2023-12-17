@@ -47,3 +47,15 @@ exports.getUpstreamState = async () => {
     numSavedTracks: response.data.total,
   };
 };
+
+exports.getUserProfile = async () => {
+  const accessToken = await userTokenStore.getAccessToken();
+
+  const response = await spotifyApi.get("/me", {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+
+  return response.data;
+};

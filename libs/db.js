@@ -3,6 +3,17 @@ const { getUpstreamState } = require("./api");
 
 const db = new Database(`${__dirname}/../_db.sqlite`, { fileMustExist: true });
 
+exports.saveUserProfile = (id, displayName) => {
+  const insertUser = db.prepare(`
+    INSERT INTO user
+      (id, display_name)
+    VALUES
+      (?, ?)
+  `);
+
+  insertUser.run(id, displayName);
+};
+
 exports.clearRecords = db.transaction(() => {
   db.prepare(`DELETE FROM track;`).run();
   db.prepare(`DELETE FROM album;`);

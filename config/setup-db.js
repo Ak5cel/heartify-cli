@@ -5,6 +5,15 @@ exports.setupDB = () => {
 
   db.prepare(
     `
+    CREATE TABLE IF NOT EXISTS user (
+      id TEXT PRIMARY KEY,
+      display_name TEXT
+    );
+    `
+  ).run();
+
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS album (
       id TEXT PRIMARY KEY,
       name TEXT,
