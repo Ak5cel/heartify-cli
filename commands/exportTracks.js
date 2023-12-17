@@ -1,6 +1,11 @@
 const fs = require("fs/promises");
-const { fetchLikedSongs } = require("../libs/api");
-const { saveTrack, clearRecords, checkIsDBUpToDate } = require("../libs/db");
+const { fetchLikedSongs, createPlaylist } = require("../libs/api");
+const {
+  saveTrack,
+  clearRecords,
+  checkIsDBUpToDate,
+  getUserProfile,
+} = require("../libs/db");
 
 exports.exportTracks = async (playlistName, visibility) => {
   console.log("Checking for changes upstream...");
@@ -16,6 +21,17 @@ exports.exportTracks = async (playlistName, visibility) => {
   }
 
   // make new playlist
+  const { id: userId } = getUserProfile();
+  const { playlistId, playlistURI } = await createPlaylist(
+    playlistName,
+    visibility
+  );
+  console.log(`\nCreated new playlist '${playlistName}'.`);
+
+  console.log(
+    `Find it in your Spotify libary, or by searching for the uri: \n\n\t${playlistURI}\n\nin the Spotify desktop client.`
+  );
+
   // add songs to playlist
 };
 

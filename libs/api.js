@@ -1,6 +1,7 @@
 const axios = require("axios");
 const userTokenStore = require("../config/userTokenStore");
 const globals = require("../config/globals");
+const { getUserProfile } = require("./db");
 
 const spotifyApi = axios.create({
   baseURL: "https://api.spotify.com/v1",
@@ -58,4 +59,27 @@ exports.getUserProfile = async () => {
   });
 
   return response.data;
+};
+
+exports.createPlaylist = async (playlistName, visibility = "public") => {
+  const accessToken = await userTokenStore.getAccessToken();
+  const { id: userId } = getUserProfile();
+
+  const response = await spotifyApi.post(
+    `/users/${userId}/playlists`,
+    {
+      name: playlistName,
+      public: visibility === "private" ? false : true,
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
+
+  const playlistId = response.data.id;
+  const playlistURI = response.data.uri;
+
+  return { playlistId, playlistURI };
 };

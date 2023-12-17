@@ -1,5 +1,4 @@
 const Database = require("better-sqlite3");
-const { getUpstreamState } = require("./api");
 
 const db = new Database(`${__dirname}/../_db.sqlite`, { fileMustExist: true });
 
@@ -12,6 +11,10 @@ exports.saveUserProfile = (id, displayName) => {
   `);
 
   insertUser.run(id, displayName);
+};
+
+exports.getUserProfile = () => {
+  return db.prepare(`SELECT * FROM user`).get();
 };
 
 exports.clearRecords = db.transaction(() => {
@@ -63,6 +66,7 @@ exports.getLastFetchState = () => {
 };
 
 exports.checkIsDBUpToDate = async () => {
+  const { getUpstreamState } = require("./api");
   const upstreamState = await getUpstreamState();
   const dbState = this.getLastFetchState();
 
