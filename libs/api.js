@@ -27,3 +27,23 @@ async function* fetchLikedSongs() {
 }
 
 module.exports.fetchLikedSongs = fetchLikedSongs;
+
+exports.getUpstreamState = async () => {
+  const accessToken = await userTokenStore.getAccessToken();
+
+  const response = await spotifyApi.get("/me/tracks", {
+    params: {
+      limit: 1,
+    },
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+
+  const lastSavedTrack = response.data.items[0];
+
+  return {
+    lastAddedAt: lastSavedTrack.added_at,
+    numSavedTracks: response.data.total,
+  };
+};

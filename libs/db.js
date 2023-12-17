@@ -1,4 +1,5 @@
 const Database = require("better-sqlite3");
+const { getUpstreamState } = require("./api");
 
 const db = new Database(`${__dirname}/../_db.sqlite`, { fileMustExist: true });
 
@@ -35,5 +36,27 @@ exports.saveTrack = (savedTrackObj) => {
     track.explicit ? 1 : 0,
     track.popularity,
     album.id
+  );
+};
+
+exports.getLastFetchState = () => {
+  const lastAddedAt = db
+    .prepare(`SELECT MAX(added_at) AS val FROM track`)
+    .get().val;
+
+  const numFetchedTracks = db
+    .prepare("SELECT COUNT(*) AS val FROM track")
+    .get().val;
+
+  return { lastAddedAt, numFetchedTracks };
+};
+
+exports.checkIsDBUpToDate = async () => {
+  const upstreamState = await getUpstreamState();
+  const dbState = this.getLastFetchState();
+
+  return (
+    upstreamState.lastAddedAt === dbState.lastAddedAt &&
+    upstreamState.numSavedTracks === dbState.numFetchedTracks
   );
 };

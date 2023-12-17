@@ -1,12 +1,25 @@
 const fs = require("fs/promises");
 const { fetchLikedSongs } = require("../libs/api");
-const { saveTrack, clearRecords } = require("../libs/db");
+const { saveTrack, clearRecords, checkIsDBUpToDate } = require("../libs/db");
 
 exports.exportTracks = async (playlistName, visibility) => {
-  console.log("Clearing previous data");
-  clearRecords();
+  console.log("Checking for changes upstream...");
+  const isUpToDate = checkIsDBUpToDate();
+  if (isUpToDate) {
+    console.log("Everything up to date.");
+  } else {
+    console.log("Clearing previous data");
+    clearRecords();
 
-  // fetch liked songs
+    // fetch liked songs
+    await reFetchLikedSongs();
+  }
+
+  // make new playlist
+  // add songs to playlist
+};
+
+const reFetchLikedSongs = async () => {
   console.log("Fetching Liked songs");
 
   let count = 0;
@@ -25,7 +38,4 @@ exports.exportTracks = async (playlistName, visibility) => {
   process.stdout.write(`Fetched ${count} songs.\n`);
 
   console.log("Done.");
-
-  // make new playlist
-  // add songs to playlist
 };
