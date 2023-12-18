@@ -75,3 +75,20 @@ exports.checkIsDBUpToDate = async () => {
     upstreamState.numSavedTracks === dbState.numFetchedTracks
   );
 };
+
+function* getFetchedTracks() {
+  const numFetchedTracks = db
+    .prepare("SELECT COUNT(*) AS val FROM track")
+    .get().val;
+
+  const stmt = db.prepare(
+    `SELECT id as id FROM track ORDER BY added_at DESC LIMIT 100 OFFSET ?`
+  );
+
+  for (let offset = 0; offset < numFetchedTracks; offset += 100) {
+    const rows = stmt.raw().all(offset).flat();
+
+    yield rows;
+  }
+}
+module.exports.getFetchedTracks = getFetchedTracks;

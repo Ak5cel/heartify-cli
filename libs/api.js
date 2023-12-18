@@ -83,3 +83,27 @@ exports.createPlaylist = async (playlistName, visibility = "public") => {
 
   return { playlistId, playlistURI };
 };
+
+exports.addTracksToPlaylist = async (playlistId, trackIDs) => {
+  const accessToken = await userTokenStore.getAccessToken();
+
+  const trackURIs = trackIDs.map((trackID) => `spotify:track:${trackID}`);
+
+  try {
+    const response = await spotifyApi.post(
+      `/playlists/${playlistId}/tracks`,
+      {
+        uris: trackURIs,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (err) {
+    console.log(err.response.data);
+  }
+};
