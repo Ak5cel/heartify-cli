@@ -7,7 +7,10 @@ exports.setupDB = () => {
     `
     CREATE TABLE IF NOT EXISTS user (
       id TEXT PRIMARY KEY,
-      display_name TEXT
+      display_name TEXT,
+      access_token TEXT,
+      refresh_token TEXT,
+      valid_until integer
     );
     `
   ).run();

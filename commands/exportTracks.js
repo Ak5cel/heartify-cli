@@ -14,7 +14,7 @@ const {
 
 exports.exportTracks = async (playlistName, visibility) => {
   console.log("Checking for changes upstream...");
-  const isUpToDate = checkIsDBUpToDate();
+  const isUpToDate = await checkIsDBUpToDate();
   if (isUpToDate) {
     console.log("Everything up to date.");
   } else {

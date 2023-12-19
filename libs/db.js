@@ -1,6 +1,6 @@
 const Database = require("better-sqlite3");
 
-const db = new Database(`${__dirname}/../_db.sqlite`, { fileMustExist: true });
+const db = new Database(`${__dirname}/../_db.sqlite`);
 
 exports.saveUserProfile = (id, displayName) => {
   const insertUser = db.prepare(`
@@ -14,7 +14,39 @@ exports.saveUserProfile = (id, displayName) => {
 };
 
 exports.getUserProfile = () => {
-  return db.prepare(`SELECT * FROM user`).get();
+  return db.prepare(`SELECT id, display_name FROM user`).get();
+};
+
+exports.setUserTokens = (accessToken, refreshToken, validUntil) => {
+  const { id } = this.getUserProfile();
+
+  const stmt = db.prepare(`
+    UPDATE user 
+    SET access_token=?, 
+        refresh_token=?, 
+        valid_until=? 
+    WHERE id=?
+  `);
+
+  stmt.run(accessToken, refreshToken, validUntil, id);
+};
+
+exports.getUserTokens = () => {
+  return db
+    .prepare("SELECT access_token, refresh_token, valid_until FROM user")
+    .get();
+};
+
+exports.getAccessToken = () => {
+  return db.prepare("SELECT access_token FROM user").get();
+};
+
+exports.getRefreshToken = () => {
+  return db.prepare("SELECT refresh_token FROM user").get();
+};
+
+exports.getValidUntil = () => {
+  return db.prepare("SELECT valid_until FROM user").get();
 };
 
 exports.clearRecords = db.transaction(() => {

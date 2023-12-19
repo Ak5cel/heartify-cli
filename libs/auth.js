@@ -2,8 +2,8 @@ const crypto = require("crypto");
 const QueryString = require("qs");
 const { base64Encode, sha256 } = require("../utils/encoders");
 const globals = require("../config/globals");
-const userTokenStore = require("../config/userTokenStore");
 const { default: axios } = require("axios");
+const { getRefreshToken, getValidUntil } = require("./db");
 
 exports.generateSpotifyAuthURL = () => {
   const baseURL = "https://accounts.spotify.com/authorize";
@@ -76,7 +76,7 @@ exports.exchangeCodeForTokens = (authCode) => {
 exports.refreshTokens = async () => {
   const endpoint = "https://accounts.spotify.com/api/token";
 
-  const refreshToken = await userTokenStore.getRefreshToken();
+  const { refresh_token: refreshToken } = getRefreshToken();
 
   const postBody = {
     grant_type: "refresh_token",
@@ -104,7 +104,7 @@ exports.refreshTokens = async () => {
 };
 
 exports.checkIsValidToken = async () => {
-  const validUntil = await userTokenStore.getValidUntil();
+  const { valid_until: validUntil } = getValidUntil();
   const now = Date.now();
 
   return validUntil > now;

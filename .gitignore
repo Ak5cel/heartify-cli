@@ -3,7 +3,6 @@ node_modules/
 
 # secrets and dotenv environment variable files
 .env
-_userTokens.json
 
 # testing and coverage
 coverage/

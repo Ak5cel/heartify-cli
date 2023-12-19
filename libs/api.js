@@ -1,21 +1,20 @@
 const axios = require("axios");
-const userTokenStore = require("../config/userTokenStore");
 const globals = require("../config/globals");
-const { getUserProfile } = require("./db");
+const { getUserProfile, getAccessToken } = require("./db");
 
 const spotifyApi = axios.create({
   baseURL: "https://api.spotify.com/v1",
 });
 
 async function* fetchLikedSongs() {
-  const accessToken = await userTokenStore.getAccessToken();
+  const { access_token } = getAccessToken();
 
   let url = `${globals.SPOTIFY_SAVED_TRACKS}?offset=0&limit=50`;
 
   do {
     const response = await axios.get(url, {
       headers: {
-        Authorization: "Bearer " + accessToken,
+        Authorization: "Bearer " + access_token,
       },
     });
     url = response.data.next;
@@ -30,14 +29,14 @@ async function* fetchLikedSongs() {
 module.exports.fetchLikedSongs = fetchLikedSongs;
 
 exports.getUpstreamState = async () => {
-  const accessToken = await userTokenStore.getAccessToken();
+  const { access_token } = getAccessToken();
 
   const response = await spotifyApi.get("/me/tracks", {
     params: {
       limit: 1,
     },
     headers: {
-      Authorization: "Bearer " + accessToken,
+      Authorization: "Bearer " + access_token,
     },
   });
 
@@ -49,12 +48,12 @@ exports.getUpstreamState = async () => {
   };
 };
 
-exports.getUserProfile = async () => {
-  const accessToken = await userTokenStore.getAccessToken();
+exports.getUserProfile = async (accessToken) => {
+  const _accessToken = accessToken || getAccessToken().access_token;
 
   const response = await spotifyApi.get("/me", {
     headers: {
-      Authorization: "Bearer " + accessToken,
+      Authorization: "Bearer " + _accessToken,
     },
   });
 
@@ -62,7 +61,8 @@ exports.getUserProfile = async () => {
 };
 
 exports.createPlaylist = async (playlistName, visibility = "public") => {
-  const accessToken = await userTokenStore.getAccessToken();
+  const { access_token } = getAccessToken();
+
   const { id: userId } = getUserProfile();
 
   const response = await spotifyApi.post(
@@ -73,7 +73,7 @@ exports.createPlaylist = async (playlistName, visibility = "public") => {
     },
     {
       headers: {
-        Authorization: "Bearer " + accessToken,
+        Authorization: "Bearer " + access_token,
       },
     }
   );
@@ -85,7 +85,7 @@ exports.createPlaylist = async (playlistName, visibility = "public") => {
 };
 
 exports.addTracksToPlaylist = async (playlistId, trackIDs) => {
-  const accessToken = await userTokenStore.getAccessToken();
+  const { access_token } = getAccessToken();
 
   const trackURIs = trackIDs.map((trackID) => `spotify:track:${trackID}`);
 
@@ -97,7 +97,7 @@ exports.addTracksToPlaylist = async (playlistId, trackIDs) => {
       },
       {
         headers: {
-          Authorization: "Bearer " + accessToken,
+          Authorization: "Bearer " + access_token,
         },
       }
     );

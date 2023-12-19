@@ -4,11 +4,10 @@ const {
   listenForAuthCode,
   exchangeCodeForTokens,
 } = require("../libs/auth");
-const userTokenStore = require("../config/userTokenStore");
 const app = require("../config/app");
 const { setupDB } = require("../config/setup-db");
 const { getUserProfile } = require("../libs/api");
-const { saveUserProfile } = require("../libs/db");
+const { saveUserProfile, setUserTokens } = require("../libs/db");
 
 exports.init = async () => {
   console.log("Hello! Welcome to heartify 💜");
@@ -46,16 +45,18 @@ exports.init = async () => {
 
   console.log("Completing authentication...");
 
-  const tokens = await exchangeCodeForTokens(code);
-  userTokenStore.setTokens(tokens);
+  const { accessToken, refreshToken, validUntil } = await exchangeCodeForTokens(
+    code
+  );
 
   console.log("Done.");
 
   console.log("Initialising local database...");
   setupDB();
 
-  const { id, display_name } = await getUserProfile();
+  const { id, display_name } = await getUserProfile(accessToken);
   saveUserProfile(id, display_name);
+  setUserTokens(accessToken, refreshToken, validUntil);
 
   console.log("Done.");
 };
