@@ -6,7 +6,8 @@ exports.setupDB = () => {
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS user (
-      id TEXT PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
+      spotify_id TEXT UNIQUE,
       display_name TEXT,
       access_token TEXT,
       refresh_token TEXT,

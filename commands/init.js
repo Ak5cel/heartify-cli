@@ -7,7 +7,7 @@ const {
 const app = require("../config/app");
 const { setupDB } = require("../config/setup-db");
 const { getUserProfile } = require("../libs/api");
-const { saveUserProfile, setUserTokens } = require("../libs/db");
+const { saveUserProfile, createUserWithTokens } = require("../libs/db");
 
 exports.init = async () => {
   console.log("Hello! Welcome to heartify 💜");
@@ -53,10 +53,10 @@ exports.init = async () => {
 
   console.log("Initialising local database...");
   setupDB();
+  createUserWithTokens(accessToken, refreshToken, validUntil);
 
-  const { id, display_name } = await getUserProfile(accessToken);
-  saveUserProfile(id, display_name);
-  setUserTokens(accessToken, refreshToken, validUntil);
+  const { id: spotify_id, display_name } = await getUserProfile();
+  saveUserProfile(spotify_id, display_name);
 
   console.log("Done.");
 };

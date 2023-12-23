@@ -2,33 +2,46 @@ const Database = require("better-sqlite3");
 
 const db = new Database(`${__dirname}/../_db.sqlite`);
 
-exports.saveUserProfile = (id, displayName) => {
+exports.createUserWithTokens = (accessToken, refreshToken, validUntil) => {
   const insertUser = db.prepare(`
     INSERT INTO user
-      (id, display_name)
+      (access_token, refresh_token, valid_until)
     VALUES
-      (?, ?)
+      (?, ?, ?)
   `);
 
-  insertUser.run(id, displayName);
+  insertUser.run(accessToken, refreshToken, validUntil);
+};
+
+exports.saveUserProfile = (spotify_id, display_name) => {
+  const { id } = this.getUserProfile();
+
+  const insertUser = db.prepare(`
+    UPDATE user
+    SET spotify_id=?,
+        display_name=?
+    WHERE id=?
+  `);
+
+  insertUser.run(spotify_id, display_name, id);
 };
 
 exports.getUserProfile = () => {
-  return db.prepare(`SELECT id, display_name FROM user`).get();
+  return db.prepare(`SELECT id, spotify_id, display_name FROM user`).get();
 };
 
 exports.setUserTokens = (accessToken, refreshToken, validUntil) => {
-  const { id } = this.getUserProfile();
+  const { spotify_id } = this.getUserProfile();
 
   const stmt = db.prepare(`
     UPDATE user 
     SET access_token=?, 
         refresh_token=?, 
         valid_until=? 
-    WHERE id=?
+    WHERE spotify_id=?
   `);
 
-  stmt.run(accessToken, refreshToken, validUntil, id);
+  stmt.run(accessToken, refreshToken, validUntil, spotify_id);
 };
 
 exports.getUserTokens = () => {
