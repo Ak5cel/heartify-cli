@@ -95,7 +95,7 @@ async function* fetchLikedSongs() {
 
 module.exports.fetchLikedSongs = fetchLikedSongs;
 
-exports.getUpstreamState = async () => {
+exports.fetchUpstreamState = async () => {
   const response = await spotifyApi.get("/me/tracks", {
     params: {
       limit: 1,
@@ -110,7 +110,7 @@ exports.getUpstreamState = async () => {
   };
 };
 
-exports.getUserProfile = async () => {
+exports.fetchUserProfile = async () => {
   const response = await spotifyApi.get("/me");
   return response.data;
 };

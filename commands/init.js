@@ -6,7 +6,7 @@ const {
 } = require("../libs/auth");
 const app = require("../config/app");
 const { setupDB } = require("../config/setup-db");
-const { getUserProfile } = require("../libs/api");
+const { fetchUserProfile } = require("../libs/api");
 const { saveUserProfile, createUserWithTokens } = require("../libs/db");
 
 exports.init = async () => {
@@ -55,7 +55,7 @@ exports.init = async () => {
   setupDB();
   createUserWithTokens(accessToken, refreshToken, validUntil);
 
-  const { id: spotify_id, display_name } = await getUserProfile();
+  const { id: spotify_id, display_name } = await fetchUserProfile();
   saveUserProfile(spotify_id, display_name);
 
   console.log("Done.");

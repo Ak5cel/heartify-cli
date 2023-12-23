@@ -111,8 +111,8 @@ exports.getLastFetchState = () => {
 };
 
 exports.checkIsDBUpToDate = async () => {
-  const { getUpstreamState } = require("./api");
-  const upstreamState = await getUpstreamState();
+  const { fetchUpstreamState } = require("./api");
+  const upstreamState = await fetchUpstreamState();
   const dbState = this.getLastFetchState();
 
   return (
