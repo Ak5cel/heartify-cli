@@ -89,18 +89,28 @@ exports.refreshTokens = async () => {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   };
+  return axios
+    .post(endpoint, postBody, postConfig)
+    .then((response) => {
+      const { access_token, refresh_token, expires_in } = response.data;
 
-  return axios.post(endpoint, postBody, postConfig).then((response) => {
-    const { access_token, refresh_token, expires_in } = response.data;
+      const validUntil = Date.now() + expires_in * 1000;
 
-    const validUntil = Date.now() + expires_in * 1000;
-
-    return {
-      accessToken: access_token,
-      refreshToken: refresh_token,
-      validUntil,
-    };
-  });
+      return {
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        validUntil,
+      };
+    })
+    .catch((err) => {
+      if (err.response && err.response.data) {
+        console.log(err.response.data);
+      } else if (err.request) {
+        console.log(err.request);
+      } else {
+        console.log(err);
+      }
+    });
 };
 
 exports.checkIsValidToken = async () => {

@@ -1,22 +1,89 @@
 const axios = require("axios");
 const globals = require("../config/globals");
-const { getUserProfile, getAccessToken } = require("./db");
+const { getUserProfile, getAccessToken, setUserTokens } = require("./db");
+const { refreshTokens } = require("./auth");
 
-const spotifyApi = axios.create({
-  baseURL: "https://api.spotify.com/v1",
-});
+class RootApiService {
+  constructor(baseURL) {
+    const options = {
+      baseURL: baseURL || "",
+    };
+
+    this.instance = axios.create(options);
+
+    this.instance.interceptors.request.use(
+      (config) => {
+        const { access_token } = getAccessToken();
+        if (access_token) {
+          config.headers.Authorization = "Bearer " + access_token;
+        }
+
+        return config;
+      },
+      (err) => {
+        return Promise.reject(err);
+      }
+    );
+
+    this.instance.interceptors.response.use(
+      (res) => {
+        return res;
+      },
+      async (err) => {
+        const originalConfig = err.config;
+
+        if (err.response) {
+          // Access token expired, refresh tokens then retry
+          if (err.response.status === 401 && !originalConfig._retry) {
+            originalConfig._retry = true;
+
+            try {
+              const tokens = await refreshTokens();
+              const { accessToken, refreshToken, validUntil } = tokens;
+              setUserTokens(accessToken, refreshToken, validUntil);
+              this.instance.defaults.headers.common["Authorization"] =
+                "Bearer " + accessToken;
+
+              return this.instance(originalConfig);
+            } catch (_err) {
+              if (_err.response && _err.response.data) {
+                return Promise.reject(_err.response.data);
+              }
+
+              return Promise.reject(_err);
+            }
+          }
+
+          if (err.response.status === 403 && err.response.data) {
+            return Promise.reject(err.response.data);
+          }
+        }
+
+        return Promise.reject(err);
+      }
+    );
+  }
+
+  getInstance() {
+    return this.instance;
+  }
+}
+
+class SpotifyWebApiService extends RootApiService {
+  constructor() {
+    const baseURL = "https://api.spotify.com/v1";
+    super(baseURL);
+  }
+}
+
+const baseApi = new RootApiService().getInstance();
+const spotifyApi = new SpotifyWebApiService().getInstance();
 
 async function* fetchLikedSongs() {
-  const { access_token } = getAccessToken();
-
   let url = `${globals.SPOTIFY_SAVED_TRACKS}?offset=0&limit=50`;
 
   do {
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: "Bearer " + access_token,
-      },
-    });
+    const response = await baseApi.get(url);
     url = response.data.next;
     total = response.data.total;
 
@@ -29,14 +96,9 @@ async function* fetchLikedSongs() {
 module.exports.fetchLikedSongs = fetchLikedSongs;
 
 exports.getUpstreamState = async () => {
-  const { access_token } = getAccessToken();
-
   const response = await spotifyApi.get("/me/tracks", {
     params: {
       limit: 1,
-    },
-    headers: {
-      Authorization: "Bearer " + access_token,
     },
   });
 
@@ -48,59 +110,42 @@ exports.getUpstreamState = async () => {
   };
 };
 
-exports.getUserProfile = async (accessToken) => {
-  const _accessToken = accessToken || getAccessToken().access_token;
-
-  const response = await spotifyApi.get("/me", {
-    headers: {
-      Authorization: "Bearer " + _accessToken,
-    },
-  });
-
+exports.getUserProfile = async () => {
+  const response = await spotifyApi.get("/me");
   return response.data;
 };
 
 exports.createPlaylist = async (playlistName, visibility = "public") => {
-  const { access_token } = getAccessToken();
+  const { spotify_id } = getUserProfile();
 
-  const { id: userId } = getUserProfile();
-
-  const response = await spotifyApi.post(
-    `/users/${userId}/playlists`,
-    {
+  try {
+    const response = await spotifyApi.post(`/users/${spotify_id}/playlists`, {
       name: playlistName,
       public: visibility === "private" ? false : true,
-    },
-    {
-      headers: {
-        Authorization: "Bearer " + access_token,
-      },
+    });
+
+    const playlistId = response.data.id;
+    const playlistURI = response.data.uri;
+
+    return { playlistId, playlistURI };
+  } catch (err) {
+    if (err.response && err.response.data) {
+      console.log(err.response.data);
+    } else if (err.request) {
+      console.log(err.request);
+    } else {
+      console.log(err);
     }
-  );
-
-  const playlistId = response.data.id;
-  const playlistURI = response.data.uri;
-
-  return { playlistId, playlistURI };
+  }
 };
 
 exports.addTracksToPlaylist = async (playlistId, trackIDs) => {
-  const { access_token } = getAccessToken();
-
   const trackURIs = trackIDs.map((trackID) => `spotify:track:${trackID}`);
 
   try {
-    const response = await spotifyApi.post(
-      `/playlists/${playlistId}/tracks`,
-      {
-        uris: trackURIs,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-      }
-    );
+    const response = await spotifyApi.post(`/playlists/${playlistId}/tracks`, {
+      uris: trackURIs,
+    });
 
     return response.data;
   } catch (err) {

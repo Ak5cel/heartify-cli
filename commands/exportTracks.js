@@ -26,7 +26,6 @@ exports.exportTracks = async (playlistName, visibility) => {
   }
 
   // make new playlist
-  const { id: userId } = getUserProfile();
   const { playlistId, playlistURI } = await createPlaylist(
     playlistName,
     visibility
