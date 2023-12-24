@@ -32,7 +32,11 @@ exports.exportTracks = async (playlistName, visibility, options) => {
   );
   console.log(`\nCreated new playlist '${playlistName}'.`);
 
-  const { addedFrom, addedTo } = options;
+  let { addedFrom, addedTo, year } = options;
+  if (year) {
+    addedFrom = year.addedFrom;
+    addedTo = year.addedTo;
+  }
 
   // add songs to playlist
   let count = 0;

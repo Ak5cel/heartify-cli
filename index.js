@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const { program, InvalidArgumentError } = require("commander");
+const { program, InvalidArgumentError, Option } = require("commander");
 const { init } = require("./commands/init");
 const { exportTracks } = require("./commands/exportTracks");
 const { DateTime } = require("luxon");
@@ -29,6 +29,14 @@ program
     "-t, --added-to <YYYY-MM-DD>",
     "filter by songs you Liked up to (and including) this date",
     parseDateTo
+  )
+  .addOption(
+    new Option(
+      "-Y, --year <YYYY>",
+      "filter songs by the year they were added to your Liked songs"
+    )
+      .conflicts(["addedFrom", "addedTo"])
+      .argParser(parseYear)
   )
   .action(exportTracks);
 
@@ -70,4 +78,27 @@ function parseDateTo(dateStr, dummyPrevious) {
   // string in UTC to compare against results from the Spotify Web API
   // which are returned as ISO 8601 UTC strings
   return parsedDateLocal.endOf("day").toUTC().toISO();
+}
+
+function parseYear(yearStr, dummyPrevious) {
+  let parsedDateLocal;
+
+  // instead of return a DateTime obj with an isValid property set to false,
+  // DateTime.fromObject throws its own error if yearStr is invalid.
+  // Hence, using try..catch
+  try {
+    parsedDateLocal = DateTime.fromObject({ year: yearStr });
+  } catch {
+    throw new InvalidArgumentError(`Reason: year should be of the format YYYY`);
+  }
+
+  const currentDateLocal = DateTime.now();
+  if (parsedDateLocal > currentDateLocal) {
+    throw new InvalidArgumentError(`Date should be in the past.`);
+  }
+
+  const addedFrom = parsedDateLocal.startOf("year").toUTC().toISO();
+  const addedTo = parsedDateLocal.endOf("year").toUTC().toISO();
+
+  return { addedFrom, addedTo };
 }
