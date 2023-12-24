@@ -12,7 +12,7 @@ const {
   getFetchedTracks,
 } = require("../libs/db");
 
-exports.exportTracks = async (playlistName, visibility) => {
+exports.exportTracks = async (playlistName, visibility, options) => {
   console.log("Checking for changes upstream...");
   const isUpToDate = await checkIsDBUpToDate();
   if (isUpToDate) {
@@ -32,9 +32,11 @@ exports.exportTracks = async (playlistName, visibility) => {
   );
   console.log(`\nCreated new playlist '${playlistName}'.`);
 
+  const { addedFrom } = options;
+
   // add songs to playlist
   let count = 0;
-  for await (let trackIDs of getFetchedTracks()) {
+  for await (let trackIDs of getFetchedTracks({ addedFrom })) {
     await addTracksToPlaylist(playlistId, trackIDs);
 
     count += trackIDs.length;

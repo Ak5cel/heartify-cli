@@ -121,17 +121,24 @@ exports.checkIsDBUpToDate = async () => {
   );
 };
 
-function* getFetchedTracks() {
-  const numFetchedTracks = db
-    .prepare("SELECT COUNT(*) AS val FROM track")
-    .get().val;
+function* getFetchedTracks({ addedFrom }) {
+  let queryStr = `SELECT id as id FROM track `;
 
-  const stmt = db.prepare(
-    `SELECT id as id FROM track ORDER BY added_at DESC LIMIT 100 OFFSET ?`
-  );
+  if (addedFrom) {
+    queryStr += `WHERE added_at >= @addedFrom `;
+  }
 
-  for (let offset = 0; offset < numFetchedTracks; offset += 100) {
-    const rows = stmt.raw().all(offset).flat();
+  // execute the query once at this point (before sort or limit)
+  // to get the total number of tracks to be added.
+  // This will be used to limit the execution of the generator loop below
+  const numResults = db.prepare(queryStr).all({ addedFrom }).length;
+
+  queryStr += `ORDER BY added_at DESC LIMIT 100 OFFSET @offset`;
+
+  const stmt = db.prepare(queryStr);
+
+  for (let offset = 0; offset < numResults; offset += 100) {
+    const rows = stmt.raw().all({ addedFrom, offset }).flat();
 
     yield rows;
   }
