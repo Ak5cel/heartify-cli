@@ -32,11 +32,11 @@ exports.exportTracks = async (playlistName, visibility, options) => {
   );
   console.log(`\nCreated new playlist '${playlistName}'.`);
 
-  const { addedFrom } = options;
+  const { addedFrom, addedTo } = options;
 
   // add songs to playlist
   let count = 0;
-  for await (let trackIDs of getFetchedTracks({ addedFrom })) {
+  for await (let trackIDs of getFetchedTracks({ addedFrom, addedTo })) {
     await addTracksToPlaylist(playlistId, trackIDs);
 
     count += trackIDs.length;
