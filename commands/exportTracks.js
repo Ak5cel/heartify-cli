@@ -3,6 +3,7 @@ const {
   fetchLikedSongs,
   createPlaylist,
   addTracksToPlaylist,
+  fetchArtists,
 } = require("../libs/api");
 const {
   saveTrack,
@@ -10,6 +11,8 @@ const {
   checkIsDBUpToDate,
   getUserProfile,
   getFetchedTracks,
+  batchSaveGenres,
+  getFetchedArtists,
 } = require("../libs/db");
 
 exports.exportTracks = async (playlistName, visibility, options) => {
@@ -23,6 +26,7 @@ exports.exportTracks = async (playlistName, visibility, options) => {
 
     // fetch liked songs
     await reFetchLikedSongs();
+    await fetchGenres();
   }
 
   // make new playlist
@@ -63,8 +67,8 @@ const reFetchLikedSongs = async () => {
   console.log("Fetching Liked songs");
 
   let count = 0;
-  for await (let [song, total] of fetchLikedSongs()) {
-    saveTrack(song);
+  for await (let [savedTrackObj, total] of fetchLikedSongs()) {
+    saveTrack(savedTrackObj);
 
     count++;
 
@@ -78,4 +82,27 @@ const reFetchLikedSongs = async () => {
   process.stdout.write(`Fetched ${count} songs.\n`);
 
   console.log("Done.");
+};
+
+const fetchGenres = async () => {
+  console.log("Fetching genre data...");
+
+  let count = 0;
+  for await (let artistIDs of getFetchedArtists()) {
+    const artists = await fetchArtists(artistIDs);
+    const genreData = artists.map((artist) => {
+      return { artistID: artist.id, genres: artist.genres };
+    });
+
+    batchSaveGenres(genreData);
+
+    count += artistIDs.length;
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(`Adding genres for [${count}] artists...`);
+  }
+
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  process.stdout.write(`Done.\n`);
 };

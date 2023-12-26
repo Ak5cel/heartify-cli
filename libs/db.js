@@ -1,6 +1,8 @@
 const Database = require("better-sqlite3");
 
 const db = new Database(`${__dirname}/../_db.sqlite`);
+db.pragma("journal_mode = WAL");
+db.pragma("synchronous = NORMAL");
 
 exports.createUserWithTokens = (accessToken, refreshToken, validUntil) => {
   const insertUser = db.prepare(`
@@ -63,11 +65,15 @@ exports.getValidUntil = () => {
 };
 
 exports.clearRecords = db.transaction(() => {
+  db.prepare("DELETE FROM track_artist").run();
   db.prepare(`DELETE FROM track;`).run();
-  db.prepare(`DELETE FROM album;`);
+  db.prepare("DELETE FROM artist_genre").run();
+  db.prepare("DELETE FROM genre").run();
+  db.prepare("DELETE FROM artist").run();
+  db.prepare(`DELETE FROM album;`).run();
 });
 
-exports.saveTrack = (savedTrackObj) => {
+exports.saveTrack = db.transaction((savedTrackObj) => {
   const { added_at, track } = savedTrackObj;
 
   const insertAlbum = db.prepare(`
@@ -96,7 +102,55 @@ exports.saveTrack = (savedTrackObj) => {
     track.popularity,
     album.id
   );
-};
+
+  const insertArtist = db.prepare(`
+    INSERT OR IGNORE INTO artist 
+      (id, name)
+    VALUES
+      (?, ?)
+  `);
+
+  const insertTrackArtist = db.prepare(`
+    INSERT OR IGNORE INTO track_artist 
+      (track_id, artist_id)
+    VALUES
+      (?, ?)
+  `);
+
+  for (const artist of track.artists) {
+    insertArtist.run(artist.id, artist.name);
+    insertTrackArtist.run(track.id, artist.id);
+  }
+});
+
+exports.saveArtistGenres = db.transaction((artistID, genres) => {
+  const insertGenre = db.prepare(`
+    INSERT OR IGNORE INTO genre
+      (name)
+    VALUES
+      (?)
+  `);
+
+  const insertArtistGenre = db.prepare(`
+    INSERT INTO artist_genre
+      (artist_id, genre_name)
+    VALUES
+      (?, ?)
+  `);
+
+  for (const genre of genres) {
+    insertGenre.run(genre);
+    insertArtistGenre.run(artistID, genre);
+  }
+});
+
+exports.batchSaveGenres = db.transaction((genreData) => {
+  for ({ artistID, genres } of genreData) {
+    if (genres.length) {
+      this.saveArtistGenres(artistID, genres);
+    }
+  }
+});
 
 exports.getLastFetchState = () => {
   const lastAddedAt = db
@@ -121,7 +175,7 @@ exports.checkIsDBUpToDate = async () => {
   );
 };
 
-function* getFetchedTracks({ addedFrom, addedTo }) {
+function* getFetchedTracks({ addedFrom, addedTo }, n = 100) {
   let queryStr = "SELECT id as id FROM track ";
 
   const filters = [];
@@ -143,14 +197,27 @@ function* getFetchedTracks({ addedFrom, addedTo }) {
   // This will be used to limit the execution of the generator loop below
   const numResults = db.prepare(queryStr).all({ addedFrom, addedTo }).length;
 
-  queryStr += `ORDER BY added_at DESC LIMIT 100 OFFSET @offset`;
+  queryStr += `ORDER BY added_at DESC LIMIT ${n} OFFSET @offset`;
 
   const stmt = db.prepare(queryStr);
 
-  for (let offset = 0; offset < numResults; offset += 100) {
+  for (let offset = 0; offset < numResults; offset += n) {
     const rows = stmt.raw().all({ addedFrom, addedTo, offset }).flat();
 
     yield rows;
   }
 }
 module.exports.getFetchedTracks = getFetchedTracks;
+
+function* getFetchedArtists() {
+  const numArtists = db.prepare("SELECT COUNT(*) AS val FROM artist").get().val;
+
+  const stmt = db.prepare("SELECT id FROM artist LIMIT 50 OFFSET @offset");
+
+  for (let offset = 0; offset < numArtists; offset += 50) {
+    const artistIDs = stmt.raw().all({ offset }).flat();
+
+    yield artistIDs;
+  }
+}
+module.exports.getFetchedArtists = getFetchedArtists;

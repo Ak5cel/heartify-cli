@@ -28,6 +28,23 @@ exports.setupDB = () => {
 
   db.prepare(
     `
+    CREATE TABLE IF NOT EXISTS artist (
+      id TEXT PRIMARY KEY,
+      name TEXT
+    );
+    `
+  ).run();
+
+  db.prepare(
+    `
+    CREATE TABLE IF NOT EXISTS genre (
+      name TEXT PRIMARY KEY
+    );
+    `
+  ).run();
+
+  db.prepare(
+    `
     CREATE TABLE IF NOT EXISTS track (
       id TEXT PRIMARY KEY,
       added_at TEXT,
@@ -38,6 +55,24 @@ exports.setupDB = () => {
       album_id TEXT,
       
       FOREIGN KEY (album_id) REFERENCES album(id)
+    );
+    `
+  ).run();
+
+  db.prepare(
+    `
+    CREATE TABLE IF NOT EXISTS track_artist (
+      track_id TEXT REFERENCES track(id),
+      artist_id TEXT REFERENCES artist(id)
+    );
+    `
+  ).run();
+
+  db.prepare(
+    `
+    CREATE TABLE IF NOT EXISTS artist_genre (
+      artist_id TEXT REFERENCES artist(id),
+      genre_name TEXT REFERENCES genre(name)
     );
     `
   ).run();

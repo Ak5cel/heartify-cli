@@ -54,6 +54,21 @@ class RootApiService {
             }
           }
 
+          if (err.response.status === 429) {
+            const delay = err.response.headers["retry-after"] | 1;
+            const delay_ms = delay * 1000;
+
+            console.log("waiting");
+            const delayRetry = new Promise((resolve) => {
+              setTimeout(() => {
+                console.log("retrying the request", originalConfig.url);
+                resolve();
+              }, delay_ms);
+            });
+
+            return delayRetry.then(() => this.instance(originalConfig));
+          }
+
           if (err.response.status === 403 && err.response.data) {
             return Promise.reject(err.response.data);
           }
@@ -113,6 +128,15 @@ exports.fetchUpstreamState = async () => {
 exports.fetchUserProfile = async () => {
   const response = await spotifyApi.get("/me");
   return response.data;
+};
+
+exports.fetchArtists = async (artistIDs) => {
+  const response = await spotifyApi.get(`/artists`, {
+    params: {
+      ids: artistIDs.join(","),
+    },
+  });
+  return response.data.artists;
 };
 
 exports.createPlaylist = async (playlistName, visibility = "public") => {
