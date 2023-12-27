@@ -52,6 +52,18 @@ exports.setupDB = () => {
       explicit BOOLEAN,
       popularity INTEGER,
       album_id TEXT,
+      danceability REAL,
+      energy REAL,
+      key INTEGER,
+      loudness REAL,
+      mode INTEGER,
+      speechiness REAL,
+      acousticness REAL,
+      instrumentalness REAL,
+      liveness REAL,
+      valence REAL,
+      tempo REAL,
+      time_signature INTEGER,
       
       FOREIGN KEY (album_id) REFERENCES album(id)
     );

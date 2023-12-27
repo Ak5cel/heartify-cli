@@ -139,6 +139,16 @@ exports.fetchArtists = async (artistIDs) => {
   return response.data.artists;
 };
 
+exports.fetchAudioFeatures = async (trackIDs) => {
+  const response = await spotifyApi.get("/audio-features", {
+    params: {
+      ids: trackIDs.join(","),
+    },
+  });
+
+  return response.data.audio_features;
+};
+
 exports.createPlaylist = async (playlistName, visibility = "public") => {
   const { spotify_id } = getUserProfile();
 

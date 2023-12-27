@@ -145,6 +145,44 @@ exports.batchSaveGenres = db.transaction((genreData) => {
   }
 });
 
+exports.saveTrackAudioFeatures = (trackID, audioFeatures) => {
+  const features = [
+    "danceability",
+    "energy",
+    "key",
+    "loudness",
+    "mode",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence",
+    "tempo",
+    "time_signature",
+  ];
+
+  const fieldPairs = features.map((feature) => `${feature} = @${feature}`);
+  const fields = fieldPairs.join(", ");
+
+  const updateAudioFeatures = db.prepare(`
+    UPDATE track
+    SET 
+      ${fields}
+    WHERE
+      id = @trackID
+  `);
+
+  updateAudioFeatures.run({ ...audioFeatures, trackID });
+};
+
+exports.batchSaveAudioFeatures = db.transaction((trackFeatures) => {
+  for ({ trackID, audioFeatures } of trackFeatures) {
+    if (audioFeatures) {
+      this.saveTrackAudioFeatures(trackID, audioFeatures);
+    }
+  }
+});
+
 exports.getLastFetchState = () => {
   const lastAddedAt = db
     .prepare(`SELECT MAX(added_at) AS val FROM track`)

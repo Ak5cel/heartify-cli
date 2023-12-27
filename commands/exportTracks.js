@@ -4,6 +4,7 @@ const {
   createPlaylist,
   addTracksToPlaylist,
   fetchArtists,
+  fetchAudioFeatures,
 } = require("../libs/api");
 const {
   saveTrack,
@@ -12,6 +13,7 @@ const {
   getFetchedTracks,
   batchSaveGenres,
   getFetchedArtists,
+  batchSaveAudioFeatures,
 } = require("../libs/db");
 
 exports.exportTracks = async (playlistName, visibility, options) => {
@@ -26,6 +28,7 @@ exports.exportTracks = async (playlistName, visibility, options) => {
     // fetch liked songs
     await reFetchLikedSongs();
     await fetchGenres();
+    await fetchAllAudioFeatures();
   }
 
   // make new playlist
@@ -99,6 +102,29 @@ const fetchGenres = async () => {
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
     process.stdout.write(`Adding genres for [${count}] artists...`);
+  }
+
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  process.stdout.write(`Done.\n`);
+};
+
+const fetchAllAudioFeatures = async () => {
+  console.log("Fetching audio features...");
+
+  let count = 0;
+  for await (let trackIDs of getFetchedTracks({}, 100)) {
+    const audioFeatures = await fetchAudioFeatures(trackIDs);
+    const trackFeatures = audioFeatures.map((featuresObj) => {
+      return { trackID: featuresObj.id, audioFeatures: featuresObj };
+    });
+
+    batchSaveAudioFeatures(trackFeatures);
+
+    count += trackIDs.length;
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(`Fetching audio features for [${count}] songs...`);
   }
 
   process.stdout.clearLine();
