@@ -175,8 +175,15 @@ exports.checkIsDBUpToDate = async () => {
   );
 };
 
-function* getFetchedTracks({ addedFrom, addedTo }, n = 100) {
-  let queryStr = "SELECT id as id FROM track ";
+function* getFetchedTracks({ addedFrom, addedTo, genre }, n = 100) {
+  console.log("looking for genre", genre);
+  let queryStr = `
+    SELECT id as id
+    FROM track JOIN track_artist
+      ON track.id = track_artist.track_id
+    JOIN artist_genre
+      ON track_artist.artist_id = artist_genre.artist_id
+  `;
 
   const filters = [];
 
@@ -188,6 +195,10 @@ function* getFetchedTracks({ addedFrom, addedTo }, n = 100) {
     filters.push("added_at <= @addedTo ");
   }
 
+  if (genre) {
+    filters.push("genre_name = @genre ");
+  }
+
   if (filters.length) {
     queryStr += "WHERE " + filters.join(" AND ");
   }
@@ -195,14 +206,16 @@ function* getFetchedTracks({ addedFrom, addedTo }, n = 100) {
   // execute the query once at this point (before sort or limit)
   // to get the total number of tracks to be added.
   // This will be used to limit the execution of the generator loop below
-  const numResults = db.prepare(queryStr).all({ addedFrom, addedTo }).length;
+  const numResults = db
+    .prepare(queryStr)
+    .all({ addedFrom, addedTo, genre }).length;
 
   queryStr += `ORDER BY added_at DESC LIMIT ${n} OFFSET @offset`;
 
   const stmt = db.prepare(queryStr);
 
   for (let offset = 0; offset < numResults; offset += n) {
-    const rows = stmt.raw().all({ addedFrom, addedTo, offset }).flat();
+    const rows = stmt.raw().all({ addedFrom, addedTo, genre, offset }).flat();
 
     yield rows;
   }

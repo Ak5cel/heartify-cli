@@ -42,6 +42,10 @@ program
       .conflicts(["addedFrom", "addedTo"])
       .argParser(parseYear)
   )
+  .option(
+    "-g, --genre <name>",
+    "filter songs by genre. If the genre name contains multiple words, wrap in single/double quotes like 'conscious hip hop' "
+  )
   .action(exportTracks);
 
 program.parse();
