@@ -207,7 +207,6 @@ exports.checkIsDBUpToDate = async () => {
 };
 
 function* getFetchedTracks({ addedFrom, addedTo, genre }, n = 100) {
-  console.log("looking for genre", genre);
   let queryStr = `
     SELECT DISTINCT id
     FROM track LEFT JOIN track_artist
