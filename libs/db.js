@@ -171,10 +171,10 @@ exports.checkIsDBUpToDate = async () => {
 function* getFetchedTracks({ addedFrom, addedTo, genre }, n = 100) {
   console.log("looking for genre", genre);
   let queryStr = `
-    SELECT id as id
-    FROM track JOIN track_artist
+    SELECT DISTINCT id
+    FROM track LEFT JOIN track_artist
       ON track.id = track_artist.track_id
-    JOIN artist_genre
+    LEFT JOIN artist_genre
       ON track_artist.artist_id = artist_genre.artist_id
   `;
 
