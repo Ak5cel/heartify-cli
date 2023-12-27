@@ -45,15 +45,13 @@ exports.init = async () => {
 
   console.log("Completing authentication...");
 
-  const { accessToken, refreshToken, validUntil } = await exchangeCodeForTokens(
-    code
-  );
+  const { accessToken, refreshToken } = await exchangeCodeForTokens(code);
 
   console.log("Done.");
 
   console.log("Initialising local database...");
   setupDB();
-  createUserWithTokens(accessToken, refreshToken, validUntil);
+  createUserWithTokens(accessToken, refreshToken);
 
   const { id: spotify_id, display_name } = await fetchUserProfile();
   saveUserProfile(spotify_id, display_name);

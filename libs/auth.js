@@ -3,7 +3,7 @@ const QueryString = require("qs");
 const { base64Encode, sha256 } = require("../utils/encoders");
 const globals = require("../config/globals");
 const { default: axios } = require("axios");
-const { getRefreshToken, getValidUntil } = require("./db");
+const { getRefreshToken } = require("./db");
 
 exports.generateSpotifyAuthURL = () => {
   const baseURL = "https://accounts.spotify.com/authorize";
@@ -61,14 +61,11 @@ exports.exchangeCodeForTokens = (authCode) => {
   };
 
   return axios.post(endpoint, postBody, postConfig).then((response) => {
-    const { access_token, refresh_token, expires_in } = response.data;
-
-    const validUntil = Date.now() + expires_in * 1000;
+    const { access_token, refresh_token } = response.data;
 
     return {
       accessToken: access_token,
       refreshToken: refresh_token,
-      validUntil,
     };
   });
 };
@@ -92,14 +89,11 @@ exports.refreshTokens = async () => {
   return axios
     .post(endpoint, postBody, postConfig)
     .then((response) => {
-      const { access_token, refresh_token, expires_in } = response.data;
-
-      const validUntil = Date.now() + expires_in * 1000;
+      const { access_token, refresh_token } = response.data;
 
       return {
         accessToken: access_token,
         refreshToken: refresh_token,
-        validUntil,
       };
     })
     .catch((err) => {
@@ -111,11 +105,4 @@ exports.refreshTokens = async () => {
         console.log(err);
       }
     });
-};
-
-exports.checkIsValidToken = async () => {
-  const { valid_until: validUntil } = getValidUntil();
-  const now = Date.now();
-
-  return validUntil > now;
 };

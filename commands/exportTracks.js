@@ -9,7 +9,6 @@ const {
   saveTrack,
   clearRecords,
   checkIsDBUpToDate,
-  getUserProfile,
   getFetchedTracks,
   batchSaveGenres,
   getFetchedArtists,

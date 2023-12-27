@@ -39,8 +39,8 @@ class RootApiService {
 
             try {
               const tokens = await refreshTokens();
-              const { accessToken, refreshToken, validUntil } = tokens;
-              setUserTokens(accessToken, refreshToken, validUntil);
+              const { accessToken, refreshToken } = tokens;
+              setUserTokens(accessToken, refreshToken);
               this.instance.defaults.headers.common["Authorization"] =
                 "Bearer " + accessToken;
 

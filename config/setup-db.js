@@ -10,8 +10,7 @@ exports.setupDB = () => {
       spotify_id TEXT UNIQUE,
       display_name TEXT,
       access_token TEXT,
-      refresh_token TEXT,
-      valid_until integer
+      refresh_token TEXT
     );
     `
   ).run();

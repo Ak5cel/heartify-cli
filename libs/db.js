@@ -4,15 +4,15 @@ const db = new Database(`${__dirname}/../_db.sqlite`);
 db.pragma("journal_mode = WAL");
 db.pragma("synchronous = NORMAL");
 
-exports.createUserWithTokens = (accessToken, refreshToken, validUntil) => {
+exports.createUserWithTokens = (accessToken, refreshToken) => {
   const insertUser = db.prepare(`
     INSERT INTO user
-      (access_token, refresh_token, valid_until)
+      (access_token, refresh_token)
     VALUES
-      (?, ?, ?)
+      (?, ?)
   `);
 
-  insertUser.run(accessToken, refreshToken, validUntil);
+  insertUser.run(accessToken, refreshToken);
 };
 
 exports.saveUserProfile = (spotify_id, display_name) => {
@@ -32,24 +32,21 @@ exports.getUserProfile = () => {
   return db.prepare(`SELECT id, spotify_id, display_name FROM user`).get();
 };
 
-exports.setUserTokens = (accessToken, refreshToken, validUntil) => {
+exports.setUserTokens = (accessToken, refreshToken) => {
   const { spotify_id } = this.getUserProfile();
 
   const stmt = db.prepare(`
     UPDATE user 
     SET access_token=?, 
         refresh_token=?, 
-        valid_until=? 
     WHERE spotify_id=?
   `);
 
-  stmt.run(accessToken, refreshToken, validUntil, spotify_id);
+  stmt.run(accessToken, refreshToken, spotify_id);
 };
 
 exports.getUserTokens = () => {
-  return db
-    .prepare("SELECT access_token, refresh_token, valid_until FROM user")
-    .get();
+  return db.prepare("SELECT access_token, refresh_token FROM user").get();
 };
 
 exports.getAccessToken = () => {
@@ -58,10 +55,6 @@ exports.getAccessToken = () => {
 
 exports.getRefreshToken = () => {
   return db.prepare("SELECT refresh_token FROM user").get();
-};
-
-exports.getValidUntil = () => {
-  return db.prepare("SELECT valid_until FROM user").get();
 };
 
 exports.clearRecords = db.transaction(() => {
