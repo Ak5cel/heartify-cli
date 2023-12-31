@@ -127,6 +127,19 @@ describe("parseFilters()", () => {
         ],
       });
     });
+    test("should not append duplicate obj to the array for an existing field", () => {
+      const date = "2023-01-01";
+      const datetime = DateTime.fromISO(date);
+      const from = datetime.startOf("day").toUTC().toISO();
+      const to = datetime.endOf("day").toUTC().toISO();
+
+      const testPrevious = { released_on: [{ from, to }] };
+      const duplicateTestStr = `released_on=${date}`;
+
+      expect(parseFilters(duplicateTestStr, testPrevious)).toMatchObject({
+        released_on: [{ from, to }],
+      });
+    });
   });
 
   describe("case: singular values field=value (numerical values)", () => {

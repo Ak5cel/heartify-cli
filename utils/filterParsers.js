@@ -71,7 +71,12 @@ exports.parseFilters = (str, previous) => {
   }
 
   if (previous[field]) {
-    if (!previous[field].includes(val)) {
+    if (
+      !previous[field].includes(val) &&
+      !previous[field].find(
+        (x) => typeof x === "object" && x.from === val.from && x.to === val.to
+      )
+    ) {
       previous[field].push(val);
     }
   } else {
