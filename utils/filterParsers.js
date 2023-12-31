@@ -5,7 +5,7 @@ exports.parseFilters = (str, previous) => {
   let { field, val } = _extractFieldValuePair(str);
 
   const strFields = ["artist"];
-  const dateTimeFields = ["released_on"];
+  const dateTimeFields = ["release_date"];
   const numberFields = [
     "danceability",
     "energy",

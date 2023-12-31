@@ -92,19 +92,19 @@ describe("parseFilters()", () => {
   describe("case: singular values field=value (DateTime values)", () => {
     test("should initialise the field as an arr with an object having `from` and `to` keys", () => {
       const testPrevious = {};
-      const testStr = "released_on=2023-01-01";
+      const testStr = "release_date=2023-01-01";
 
       expect(parseFilters(testStr, testPrevious)).toMatchObject({
-        released_on: [{ from: expect.any(String), to: expect.any(String) }],
+        release_date: [{ from: expect.any(String), to: expect.any(String) }],
       });
     });
     test("should set `from` as start of the day and `to` as end of the day", () => {
       const testPrevious = {};
-      const testStr = "released_on=2023-01-01";
+      const testStr = "release_date=2023-01-01";
       const datetime = DateTime.fromISO("2023-01-01");
 
       expect(parseFilters(testStr, testPrevious)).toMatchObject({
-        released_on: [
+        release_date: [
           {
             from: datetime.startOf("day").toUTC().toISO(),
             to: datetime.endOf("day").toUTC().toISO(),
@@ -113,12 +113,12 @@ describe("parseFilters()", () => {
       });
     });
     test("should append a new `from`/`to` obj to the array for an existing field", () => {
-      const testPrevious = { released_on: [{ from: "x", to: "y" }] };
-      const testStr = "released_on=2023-01-01";
+      const testPrevious = { release_date: [{ from: "x", to: "y" }] };
+      const testStr = "release_date=2023-01-01";
       const datetime = DateTime.fromISO("2023-01-01");
 
       expect(parseFilters(testStr, testPrevious)).toMatchObject({
-        released_on: [
+        release_date: [
           { from: "x", to: "y" },
           {
             from: datetime.startOf("day").toUTC().toISO(),
@@ -133,11 +133,11 @@ describe("parseFilters()", () => {
       const from = datetime.startOf("day").toUTC().toISO();
       const to = datetime.endOf("day").toUTC().toISO();
 
-      const testPrevious = { released_on: [{ from, to }] };
-      const duplicateTestStr = `released_on=${date}`;
+      const testPrevious = { release_date: [{ from, to }] };
+      const duplicateTestStr = `release_date=${date}`;
 
       expect(parseFilters(duplicateTestStr, testPrevious)).toMatchObject({
-        released_on: [{ from, to }],
+        release_date: [{ from, to }],
       });
     });
   });
@@ -244,11 +244,11 @@ describe("parseFilters()", () => {
 
   describe("case: ranges field=[a,b] | [a,] | [,b] (DateTime values)", () => {
     test("should set `from` key as DateTime at start of the day given", () => {
-      const testStr = "released_on=[2023-01-01,2023-12-31]";
+      const testStr = "release_date=[2023-01-01,2023-12-31]";
       const datetime = DateTime.fromISO("2023-01-01");
 
       expect(parseFilters(testStr, {})).toMatchObject({
-        released_on: [
+        release_date: [
           {
             from: datetime.startOf("day").toUTC().toISO(),
             to: expect.any(String),
@@ -257,11 +257,11 @@ describe("parseFilters()", () => {
       });
     });
     test("should set `to` key as DateTime at the end of the day given", () => {
-      const testStr = "released_on=[2023-01-01,2023-12-31]";
+      const testStr = "release_date=[2023-01-01,2023-12-31]";
       const datetime = DateTime.fromISO("2023-12-31");
 
       expect(parseFilters(testStr, {})).toMatchObject({
-        released_on: [
+        release_date: [
           {
             from: expect.any(String),
             to: datetime.endOf("day").toUTC().toISO(),
@@ -298,25 +298,25 @@ describe("parseFilters()", () => {
     });
     test("should throw InvalidArgumentError when passed a non-parseable value for a DateTime field", () => {
       expect(() => {
-        parseFilters("released_on=notADate", {});
+        parseFilters("release_date=notADate", {});
       }).toThrow(InvalidArgumentError);
       expect(() => {
-        parseFilters("released_on=notADate", {});
+        parseFilters("release_date=notADate", {});
         // using luxon for validating dates, the error reason contains the word 'unparsable'
       }).toThrow(/unparsable/);
 
       expect(() => {
-        parseFilters("released_on=[notADate,]", {});
+        parseFilters("release_date=[notADate,]", {});
       }).toThrow(InvalidArgumentError);
       expect(() => {
-        parseFilters("released_on=[notADate,]", {});
+        parseFilters("release_date=[notADate,]", {});
       }).toThrow(/unparsable/);
 
       expect(() => {
-        parseFilters("released_on=[,notADate]", {});
+        parseFilters("release_date=[,notADate]", {});
       }).toThrow(InvalidArgumentError);
       expect(() => {
-        parseFilters("released_on=[,notADate]", {});
+        parseFilters("release_date=[,notADate]", {});
       }).toThrow(/unparsable/);
     });
   });
