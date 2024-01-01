@@ -37,7 +37,7 @@ exports.exportTracks = async (playlistName, visibility, options) => {
   );
   console.log(`\nCreated new playlist '${playlistName}'.`);
 
-  let { addedFrom, addedTo, year, genre } = options;
+  let { addedFrom, addedTo, year, genre, filter } = options;
   if (year) {
     addedFrom = year.addedFrom;
     addedTo = year.addedTo;
@@ -45,7 +45,12 @@ exports.exportTracks = async (playlistName, visibility, options) => {
 
   // add songs to playlist
   let count = 0;
-  for await (let trackIDs of getFetchedTracks({ addedFrom, addedTo, genre })) {
+  for await (let trackIDs of getFetchedTracks({
+    addedFrom,
+    addedTo,
+    genre,
+    filter,
+  })) {
     await addTracksToPlaylist(playlistId, trackIDs);
 
     count += trackIDs.length;

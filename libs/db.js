@@ -206,7 +206,7 @@ exports.checkIsDBUpToDate = async () => {
   );
 };
 
-function* getFetchedTracks({ addedFrom, addedTo, genre }, n = 100) {
+function* getFetchedTracks({ addedFrom, addedTo, genre, filter }, n = 100) {
   let queryStr = `
     SELECT DISTINCT id
     FROM track LEFT JOIN track_artist
@@ -216,6 +216,7 @@ function* getFetchedTracks({ addedFrom, addedTo, genre }, n = 100) {
   `;
 
   const filters = [];
+  const filterValues = [];
 
   if (addedFrom) {
     filters.push("added_at >= @addedFrom ");
@@ -229,6 +230,54 @@ function* getFetchedTracks({ addedFrom, addedTo, genre }, n = 100) {
     filters.push("genre_name = @genre ");
   }
 
+  if (filter) {
+    Object.keys(filter).forEach((field) => {
+      const values = filter[field];
+
+      if (field === "artist") {
+        const mask = new Array(values.length).fill("?").join();
+        filters.push(
+          `track_artist.artist_id IN (SELECT id FROM artist WHERE artist.name IN (${mask})) `
+        );
+        filterValues.push(...values);
+      } else if (field === "release_date") {
+        values.forEach((pair) => {
+          let filterStr = "track.album_id IN (SELECT id FROM album WHERE ";
+          const ranges = [];
+          if (pair.from) {
+            ranges.push("release_date >= ? ");
+            filterValues.push(pair.from);
+          }
+
+          if (pair.to) {
+            ranges.push("release_date <= ? ");
+            filterValues.push(pair.to);
+          }
+
+          filterStr += ranges.join(" AND ") + ")";
+          filters.push(filterStr);
+        });
+      } else {
+        values.map((value) => {
+          if (typeof value === "object") {
+            if (typeof value.from !== "undefined") {
+              filters.push(`${field} >= ? `);
+              filterValues.push(value.from);
+            }
+
+            if (typeof value.to !== "undefined") {
+              filters.push(`${field} <= ? `);
+              filterValues.push(value.to);
+            }
+          } else {
+            filters.push(`${field} = ?`);
+            filterValues.push(value);
+          }
+        });
+      }
+    });
+  }
+
   if (filters.length) {
     queryStr += "WHERE " + filters.join(" AND ");
   }
@@ -238,14 +287,17 @@ function* getFetchedTracks({ addedFrom, addedTo, genre }, n = 100) {
   // This will be used to limit the execution of the generator loop below
   const numResults = db
     .prepare(queryStr)
-    .all({ addedFrom, addedTo, genre }).length;
+    .all({ addedFrom, addedTo, genre }, filterValues).length;
 
   queryStr += `ORDER BY added_at DESC LIMIT ${n} OFFSET @offset`;
 
   const stmt = db.prepare(queryStr);
 
   for (let offset = 0; offset < numResults; offset += n) {
-    const rows = stmt.raw().all({ addedFrom, addedTo, genre, offset }).flat();
+    const rows = stmt
+      .raw()
+      .all({ addedFrom, addedTo, genre, offset }, filterValues)
+      .flat();
 
     yield rows;
   }

@@ -8,6 +8,7 @@ const {
   parseDateTo,
   parseYear,
 } = require("./utils/dateTimeParsers");
+const { parseFilters } = require("./utils/filterParsers");
 
 program
   .command("init")
@@ -46,6 +47,7 @@ program
     "-g, --genre <name>",
     "filter songs by genre. If the genre name contains multiple words, wrap in single/double quotes like 'conscious hip hop' "
   )
+  .option("--filter <name=value...>", "specify filters", parseFilters, {})
   .action(exportTracks);
 
 program.parse();
