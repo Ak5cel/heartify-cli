@@ -237,7 +237,7 @@ exports.checkIsDBUpToDate = async () => {
   );
 };
 
-function* getFetchedTracks({ addedFrom, addedTo, genre, filter }, n = 100) {
+function* getFetchedTracks({ addedFrom, addedTo, filter }, n = 100) {
   let queryStr = `
     SELECT DISTINCT id
     FROM track LEFT JOIN track_artist
@@ -257,10 +257,6 @@ function* getFetchedTracks({ addedFrom, addedTo, genre, filter }, n = 100) {
     filters.push("added_at <= @addedTo ");
   }
 
-  if (genre) {
-    filters.push("genre_name = @genre ");
-  }
-
   if (filter) {
     Object.keys(filter).forEach((field) => {
       const values = filter[field];
@@ -270,6 +266,10 @@ function* getFetchedTracks({ addedFrom, addedTo, genre, filter }, n = 100) {
         filters.push(
           `track_artist.artist_id IN (SELECT id FROM artist WHERE artist.name IN (${mask})) `
         );
+        filterValues.push(...values);
+      } else if ((field = "genre")) {
+        const mask = new Array(values.length).fill("?").join();
+        filters.push(`genre_name IN (${mask}) `);
         filterValues.push(...values);
       } else if (field === "release_date") {
         values.forEach((pair) => {
@@ -318,16 +318,18 @@ function* getFetchedTracks({ addedFrom, addedTo, genre, filter }, n = 100) {
   // This will be used to limit the execution of the generator loop below
   const numResults = db
     .prepare(queryStr)
-    .all({ addedFrom, addedTo, genre }, filterValues).length;
+    .all({ addedFrom, addedTo }, filterValues).length;
 
   queryStr += `ORDER BY added_at DESC LIMIT ${n} OFFSET @offset`;
+
+  console.log(queryStr);
 
   const stmt = db.prepare(queryStr);
 
   for (let offset = 0; offset < numResults; offset += n) {
     const rows = stmt
       .raw()
-      .all({ addedFrom, addedTo, genre, offset }, filterValues)
+      .all({ addedFrom, addedTo, offset }, filterValues)
       .flat();
 
     yield rows;

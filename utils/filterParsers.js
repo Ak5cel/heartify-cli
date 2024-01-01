@@ -4,7 +4,7 @@ const { parseDateFrom, parseDateTo } = require("./dateTimeParsers");
 exports.parseFilters = (str, previous) => {
   let { field, val } = _extractFieldValuePair(str);
 
-  const strFields = ["artist"];
+  const strFields = ["artist", "genre"];
   const dateTimeFields = ["release_date"];
   const numberFields = [
     "danceability",
