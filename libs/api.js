@@ -149,13 +149,13 @@ exports.fetchAudioFeatures = async (trackIDs) => {
   return response.data.audio_features;
 };
 
-exports.createPlaylist = async (playlistName, visibility = "public") => {
+exports.createPlaylist = async (playlistName, onProfile = false) => {
   const { spotify_id } = getUserProfile();
 
   try {
     const response = await spotifyApi.post(`/users/${spotify_id}/playlists`, {
       name: playlistName,
-      public: visibility === "private" ? false : true,
+      public: onProfile,
     });
 
     const playlistId = response.data.id;

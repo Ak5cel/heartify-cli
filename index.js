@@ -25,7 +25,10 @@ program
     "<playlist_name>",
     "name of the new playlist. If it contains multiple words, wrap in single/double quotes like 'my playlist name'"
   )
-  .argument("[visibility]", "playlist visibility - public|private", "public")
+  .option(
+    "-p, --on-profile",
+    "add playlist to profile. If omitted, the playlist will be public but not displayed on your profile"
+  )
   .option(
     "-f, --added-from <YYYY-MM-DD>",
     "filter by songs you Liked from this date",

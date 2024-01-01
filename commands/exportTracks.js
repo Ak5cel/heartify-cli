@@ -16,7 +16,7 @@ const {
   checkTablesExist,
 } = require("../libs/db");
 
-exports.exportTracks = async (playlistName, visibility, options) => {
+exports.exportTracks = async (playlistName, options) => {
   if (!checkTablesExist()) {
     console.log("Database setup incomplete. Please run `heartify init`.");
     process.exit(1);
@@ -39,7 +39,7 @@ exports.exportTracks = async (playlistName, visibility, options) => {
   // make new playlist
   const { playlistId, playlistURI } = await createPlaylist(
     playlistName,
-    visibility
+    options.onProfile ? true : false
   );
   console.log(`\nCreated new playlist '${playlistName}'.`);
 
