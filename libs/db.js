@@ -57,6 +57,16 @@ exports.getRefreshToken = () => {
   return db.prepare("SELECT refresh_token FROM user").get();
 };
 
+exports.dropAllTables = db.transaction(() => {
+  db.prepare("DROP TABLE IF EXISTS track_artist").run();
+  db.prepare(`DROP TABLE IF EXISTS track;`).run();
+  db.prepare("DROP TABLE IF EXISTS artist_genre").run();
+  db.prepare("DROP TABLE IF EXISTS genre").run();
+  db.prepare("DROP TABLE IF EXISTS artist").run();
+  db.prepare(`DROP TABLE IF EXISTS album;`).run();
+  db.prepare(`DROP TABLE IF EXISTS user;`).run();
+});
+
 exports.clearRecords = db.transaction(() => {
   db.prepare("DELETE FROM track_artist").run();
   db.prepare(`DELETE FROM track;`).run();

@@ -7,7 +7,11 @@ const {
 const app = require("../config/app");
 const { setupDB } = require("../config/setup-db");
 const { fetchUserProfile } = require("../libs/api");
-const { saveUserProfile, createUserWithTokens } = require("../libs/db");
+const {
+  saveUserProfile,
+  createUserWithTokens,
+  dropAllTables,
+} = require("../libs/db");
 
 exports.init = async () => {
   console.log("Hello! Welcome to heartify 💜");
@@ -50,6 +54,7 @@ exports.init = async () => {
   console.log("Done.");
 
   console.log("Initialising local database...");
+  dropAllTables();
   setupDB();
   createUserWithTokens(accessToken, refreshToken);
 
