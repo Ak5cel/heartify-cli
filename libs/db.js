@@ -4,6 +4,22 @@ const db = new Database(`${__dirname}/../_db.sqlite`);
 db.pragma("journal_mode = WAL");
 db.pragma("synchronous = NORMAL");
 
+exports.checkTablesExist = db.transaction(() => {
+  const val = db
+    .prepare(
+      `
+        SELECT COUNT(*) as val 
+        FROM sqlite_master 
+        WHERE 
+          type='table' AND 
+          name IN ('user','album', 'artist', 'genre', 'artist_genre', 'track', 'track_artist')
+      `
+    )
+    .get().val;
+
+  return val === 7;
+});
+
 exports.createUserWithTokens = (accessToken, refreshToken) => {
   const insertUser = db.prepare(`
     INSERT INTO user

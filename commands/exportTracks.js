@@ -13,9 +13,15 @@ const {
   batchSaveGenres,
   getFetchedArtists,
   batchSaveAudioFeatures,
+  checkTablesExist,
 } = require("../libs/db");
 
 exports.exportTracks = async (playlistName, visibility, options) => {
+  if (!checkTablesExist()) {
+    console.log("Database setup incomplete. Please run `heartify init`.");
+    process.exit(1);
+  }
+
   console.log("Checking for changes upstream...");
   const isUpToDate = await checkIsDBUpToDate();
   if (isUpToDate) {
