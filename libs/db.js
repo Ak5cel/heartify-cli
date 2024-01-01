@@ -267,44 +267,60 @@ function* getFetchedTracks({ addedFrom, addedTo, filter }, n = 100) {
           `track_artist.artist_id IN (SELECT id FROM artist WHERE artist.name IN (${mask})) `
         );
         filterValues.push(...values);
-      } else if ((field = "genre")) {
+      } else if (field === "genre") {
         const mask = new Array(values.length).fill("?").join();
         filters.push(`genre_name IN (${mask}) `);
         filterValues.push(...values);
       } else if (field === "release_date") {
+        let filterStr = "track.album_id IN (SELECT id FROM album WHERE ";
+        let ranges = [];
+
         values.forEach((pair) => {
-          let filterStr = "track.album_id IN (SELECT id FROM album WHERE ";
-          const ranges = [];
+          const range = [];
           if (pair.from) {
-            ranges.push("release_date >= ? ");
+            range.push("release_date >= ?");
             filterValues.push(pair.from);
           }
 
           if (pair.to) {
-            ranges.push("release_date <= ? ");
+            range.push("release_date <= ?");
             filterValues.push(pair.to);
           }
 
-          filterStr += ranges.join(" AND ") + ")";
-          filters.push(filterStr);
+          const rangeStr = "(" + range.join(" AND ") + ")";
+          ranges.push(rangeStr);
         });
+
+        filterStr += ranges.join(" OR ") + ")";
+        filters.push(filterStr);
       } else {
+        // other fields, which can take both single values and ranges:
+
+        const fieldFilters = [];
         values.map((value) => {
           if (typeof value === "object") {
+            const range = [];
             if (typeof value.from !== "undefined") {
-              filters.push(`${field} >= ? `);
+              range.push(`${field} >= ?`);
               filterValues.push(value.from);
             }
 
             if (typeof value.to !== "undefined") {
-              filters.push(`${field} <= ? `);
+              range.push(`${field} <= ?`);
               filterValues.push(value.to);
             }
+            // a single from..to range is joined by AND
+            const rangeStr = "(" + range.join(" AND ") + ")";
+            fieldFilters.push(rangeStr);
           } else {
-            filters.push(`${field} = ?`);
+            fieldFilters.push(`${field} = ?`);
             filterValues.push(value);
           }
         });
+
+        // join all values/ranges for the same field by OR
+        const fieldFilterStr = "(" + fieldFilters.join(" OR ") + ")";
+        filters.push(fieldFilterStr);
       }
     });
   }
@@ -321,8 +337,6 @@ function* getFetchedTracks({ addedFrom, addedTo, filter }, n = 100) {
     .all({ addedFrom, addedTo }, filterValues).length;
 
   queryStr += `ORDER BY added_at DESC LIMIT ${n} OFFSET @offset`;
-
-  console.log(queryStr);
 
   const stmt = db.prepare(queryStr);
 
