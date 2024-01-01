@@ -10,6 +10,7 @@ const {
 } = require("./utils/datetime-parsers");
 const { parseFilters } = require("./utils/filter-parsers");
 const { logout } = require("./commands/logout");
+const { showGenres } = require("./commands/show-genres");
 
 program
   .command("init")
@@ -49,6 +50,13 @@ program
   )
   .option("--filter <name=value...>", "specify filters", parseFilters, {})
   .action(exportTracks);
+
+program
+  .command("show-genres")
+  .description(
+    "show all genres detected in the liked songs in a tabular format. Use these to filter by genre when using the `--filter` option"
+  )
+  .action(showGenres);
 
 program
   .command("logout")

@@ -237,6 +237,14 @@ exports.checkIsDBUpToDate = async () => {
   );
 };
 
+exports.getFetchedGenres = () => {
+  return db
+    .prepare("SELECT name FROM genre ORDER BY name ASC")
+    .raw()
+    .all()
+    .flat();
+};
+
 function* getFetchedTracks({ addedFrom, addedTo, filter }, n = 100) {
   let queryStr = `
     SELECT DISTINCT id
