@@ -9,6 +9,7 @@ const {
   parseYear,
 } = require("./utils/dateTimeParsers");
 const { parseFilters } = require("./utils/filterParsers");
+const { logout } = require("./commands/logout");
 
 program
   .command("init")
@@ -49,6 +50,11 @@ program
   )
   .option("--filter <name=value...>", "specify filters", parseFilters, {})
   .action(exportTracks);
+
+program
+  .command("logout")
+  .description("Logout. Removes access tokens and all saved details")
+  .action(logout);
 
 process.on("SIGHUP", () => process.exit(128 + 1));
 process.on("SIGINT", () => process.exit(128 + 2));
