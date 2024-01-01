@@ -3,6 +3,11 @@ const Database = require("better-sqlite3");
 exports.setupDB = () => {
   const db = new Database(`${__dirname}/../_db.sqlite`);
 
+  process.on("exit", () => {
+    db.close();
+    process.stdout.write("\n");
+  });
+
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS user (

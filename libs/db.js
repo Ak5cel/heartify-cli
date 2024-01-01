@@ -4,6 +4,11 @@ const db = new Database(`${__dirname}/../_db.sqlite`);
 db.pragma("journal_mode = WAL");
 db.pragma("synchronous = NORMAL");
 
+process.on("exit", () => {
+  db.close();
+  process.stdout.write("\n");
+});
+
 exports.checkTablesExist = db.transaction(() => {
   const val = db
     .prepare(
