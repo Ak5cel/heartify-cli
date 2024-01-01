@@ -2,13 +2,13 @@
 
 const { program, Option } = require("commander");
 const { init } = require("./commands/init");
-const { exportTracks } = require("./commands/exportTracks");
+const { exportTracks } = require("./commands/export-tracks");
 const {
   parseDateFrom,
   parseDateTo,
   parseYear,
-} = require("./utils/dateTimeParsers");
-const { parseFilters } = require("./utils/filterParsers");
+} = require("./utils/datetime-parsers");
+const { parseFilters } = require("./utils/filter-parsers");
 const { logout } = require("./commands/logout");
 
 program

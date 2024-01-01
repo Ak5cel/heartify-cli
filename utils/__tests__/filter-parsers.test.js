@@ -1,6 +1,6 @@
 const { InvalidArgumentError } = require("commander");
 const { DateTime } = require("luxon");
-const { parseFilters } = require("../filterParsers");
+const { parseFilters } = require("../filter-parsers");
 
 describe("parseFilters()", () => {
   describe("case: singular values field=value (assuming string type)", () => {
