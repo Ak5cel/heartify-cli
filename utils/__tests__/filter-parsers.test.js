@@ -319,5 +319,22 @@ describe("parseFilters()", () => {
         parseFilters("release_date=[,notADate]", {});
       }).toThrow(/unparsable/);
     });
+    test("should throw InvalidArgumentError when passed a range for a String field", () => {
+      expect(() => {
+        parseFilters("artist=[BTS,Epik High]", {});
+      }).toThrow(
+        new InvalidArgumentError("Found range value in String field: artist")
+      );
+      expect(() => {
+        parseFilters("artist=[,Epik High]", {});
+      }).toThrow(
+        new InvalidArgumentError("Found range value in String field: artist")
+      );
+      expect(() => {
+        parseFilters("artist=[BTS,]", {});
+      }).toThrow(
+        new InvalidArgumentError("Found range value in String field: artist")
+      );
+    });
   });
 });

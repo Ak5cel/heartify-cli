@@ -30,6 +30,12 @@ exports.parseFilters = (str, previous) => {
     throw new InvalidArgumentError(`Unknown filter field: ${field}`);
   }
 
+  if (strFields.includes(field) && typeof val === "object") {
+    throw new InvalidArgumentError(
+      `Found range value in String field: ${field}`
+    );
+  }
+
   if (typeof val === "object") {
     // if val is an object, it will have a `from` and `to` key
     // it could be either a DateTime field or a Number field
