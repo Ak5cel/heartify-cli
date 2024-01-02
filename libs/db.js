@@ -59,7 +59,7 @@ exports.setUserTokens = (accessToken, refreshToken) => {
   const stmt = db.prepare(`
     UPDATE user 
     SET access_token=?, 
-        refresh_token=?, 
+        refresh_token=? 
     WHERE spotify_id=?
   `);
 
