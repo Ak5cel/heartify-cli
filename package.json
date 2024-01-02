@@ -1,6 +1,6 @@
 {
   "name": "heartify-cli",
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha.2",
   "description": "A CLI tool to filter and export your Spotify Liked songs",
   "main": "index.js",
   "bin": {
