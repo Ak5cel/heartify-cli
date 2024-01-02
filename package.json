@@ -1,7 +1,7 @@
 {
-  "name": "heartify-spotify",
-  "version": "1.0.0",
-  "description": "A Spotify Liked songs manager that runs in the terminal",
+  "name": "heartify-cli",
+  "version": "0.1.0",
+  "description": "A CLI tool to filter and export your Spotify Liked songs",
   "main": "index.js",
   "bin": {
     "heartify": "./index.js"
@@ -10,9 +10,11 @@
     "test": "jest",
     "test-cov": "jest --coverage"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "spotify"
+  ],
+  "author": "Ak5cel",
+  "license": "MPL-2.0",
   "devDependencies": {
     "jest": "^29.7.0"
   },
