@@ -17,7 +17,12 @@ As someone with close to 2500 tracks in my Liked songs (rookie numbers, ik), I n
 ## Getting Started
 
 ### Installation
-TODO
+
+  Heartify is currently a work in progress, but you can install it here:
+  
+  ```sh
+  npm install -g heartify-cli@alpha1
+  ```
 
 ### Authorization
 
