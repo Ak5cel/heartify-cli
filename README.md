@@ -1,18 +1,28 @@
 # heartify-cli
 
-A CLI tool to export and filter out your Spotify liked songs into playlists. With support for filters like ranges of date added, release date, genre, audio features, and more.
+A CLI tool to export and filter out your Spotify liked songs into playlists. 
+With support for filters like ranges of date added, release date, genres, audio features, and more.
+
 
 ## What does it solve?
 
-As someone with close to 2500 tracks in my Liked songs (rookie numbers, ik), I needed a way to organize them without needing to move away from 'Liking' more songs. Heartify attempts to solve this problem
+Around 2500 Liked songs in, I needed a way to organise the chaos without having to move away from 'liking' any more songs. 
+Hopefully, it's useful to more people out there with little time and a lot of songs :)
 
-- Share your liked songs - Export them to a playlist ☑️
-- Make a 'My Top Songs 2023' playlist - Filter by the year you liked them ☑️
-- Make genre-mixes out of your liked songs - Filter by genre(s) ☑️
-- Make monthly playlists - No more adding songs manually to monthly playlists, simply filter by ranges of dates added ☑️
-- Decade mixes - Filter by release date ☑️
+With heartify, you may
 
-...and more
+  ✔️ Export them to a playlist - you can now share your liked songs!
+  
+  ✔️ Filter by the year you liked them - make a 'My Top Songs 2023' playlist, for example
+  
+  ✔️ Filter by genre(s) to make genre-mixes out of your liked songs
+  
+  ✔️ Make monthly playlists - no more adding songs manually to monthly playlists, simply filter by ranges of dates added
+  
+  ✔️ Decade mixes - filter by release date
+  
+  ✔️ Filter by audio features - make a workout playlist of songs in a certain bpm range, for example
+
 
 ## Getting Started
 
@@ -26,7 +36,8 @@ npm install -g heartify-cli
 
 ### Authorization
 
-Run the following command from any directory, all data is stored locally where heartify is installed. Then follow the instrcuctions to authorise access to your Spotify library.
+Run the following command from any directory, all data is stored locally where heartify is installed. 
+Then follow the instructions to authorise access to your Spotify library.
 
 ```sh
   heartify init
