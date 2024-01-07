@@ -1,6 +1,6 @@
 {
   "name": "heartify-cli",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "A CLI tool to export and filter out your Spotify liked songs into playlists. With support for filters like ranges of date added, release date, genre, audio features, and more.",
   "main": "index.js",
   "bin": {
