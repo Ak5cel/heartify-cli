@@ -1,7 +1,7 @@
 {
   "name": "heartify-cli",
   "version": "1.0.0-beta.4",
-  "description": "A CLI tool to filter and export your Spotify Liked songs",
+  "description": "A CLI tool to export and filter out your Spotify liked songs into playlists. With support for filters like ranges of date added, release date, genre, audio features, and more.",
   "main": "index.js",
   "bin": {
     "heartify": "./index.js"
@@ -18,10 +18,19 @@
     "test-cov": "jest --coverage"
   },
   "keywords": [
-    "spotify"
+    "spotify",
+    "spotify api",
+    "spotify export",
+    "spotify liked",
+    "playlist",
+    "playlist manager",
+    "spotify manager",
+    "cli",
+    "music"
   ],
   "author": "Ak5cel",
   "license": "MPL-2.0",
+  "repository": "github:Ak5cel/heartify-cli",
   "devDependencies": {
     "jest": "^29.7.0"
   },
