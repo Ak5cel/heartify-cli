@@ -4,7 +4,6 @@ const {
   listenForAuthCode,
   exchangeCodeForTokens,
 } = require("../libs/auth");
-const app = require("../config/app");
 const { setupDB } = require("../config/setup-db");
 const { fetchUserProfile } = require("../libs/api");
 const {
@@ -23,9 +22,13 @@ exports.init = async () => {
   );
   console.log(authURL);
 
-  const tempServer = http.createServer(app);
+  // spin up a temporary server to listen on port 9090
+  // wait for spotify to send data to the callback url
+  // then close the server
+  const tempServer = http.createServer();
   tempServer.listen(9090);
-  const { code, state, error } = await listenForAuthCode(app);
+
+  const { code, state, error } = await listenForAuthCode(tempServer);
 
   tempServer.close();
 

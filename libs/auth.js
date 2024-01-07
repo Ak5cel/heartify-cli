@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const QueryString = require("qs");
 const { base64Encode, sha256 } = require("../utils/encoders");
 const globals = require("../config/globals");
 const { default: axios } = require("axios");
@@ -16,7 +15,7 @@ exports.generateSpotifyAuthURL = () => {
   const state = crypto.randomBytes(8).toString("hex");
   process.env.SPOTIFY_CLIENT_STATE = state;
 
-  const params = {
+  const params = new URLSearchParams({
     client_id: globals.SPOTIFY_CLIENT_ID,
     response_type: "code",
     redirect_uri: globals.redirect_uri,
@@ -24,21 +23,24 @@ exports.generateSpotifyAuthURL = () => {
     scope: globals.scopes.join(" "),
     code_challenge_method: "S256",
     code_challenge: codeChallenge,
-  };
+  });
 
-  const fullAuthURL = baseURL + "?" + QueryString.stringify(params);
+  const fullAuthURL = baseURL + "?" + params.toString();
   return fullAuthURL;
 };
 
-exports.listenForAuthCode = (app) => {
+exports.listenForAuthCode = (server) => {
   return new Promise((resolve, reject) => {
-    app.get("/callback", (req, res, next) => {
-      const code = req.query.code;
-      const state = req.query.state;
-      const error = req.query.error;
+    server.on("request", (req, res) => {
+      const { searchParams } = new URL(`http://${req.url}`);
+
+      const code = searchParams.get("code");
+      const state = searchParams.get("state");
+      const error = searchParams.get("error");
 
       resolve({ code, state, error });
-      res.status(200).send();
+      res.statusCode = 200;
+      res.end();
     });
   });
 };

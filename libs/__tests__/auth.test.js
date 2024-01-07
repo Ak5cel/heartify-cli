@@ -51,9 +51,8 @@ describe("generateSpotifyAuthURL()", () => {
 });
 
 describe("listenForAuthCode()", () => {
-  test("should listen for a GET request to the callback and resolve with the code and state in the query parameters", async () => {
-    const testApp = require("../../config/app");
-    const testServer = http.createServer(testApp);
+  test("should listen for a GET request to the callback and resolve with the code and state when user accepts permissions", async () => {
+    const testServer = http.createServer();
     testServer.listen();
     const port = testServer.address().port;
 
@@ -66,9 +65,32 @@ describe("listenForAuthCode()", () => {
       });
     });
 
-    await expect(listenForAuthCode(testApp)).resolves.toEqual({
+    await expect(listenForAuthCode(testServer)).resolves.toEqual({
       state: "testState",
       code: "testCode",
+      error: null,
+    });
+
+    testServer.close();
+  });
+  test("should listen for a GET request to the callback and resolve with the state and error when user declines permissions", async () => {
+    const testServer = http.createServer();
+    testServer.listen();
+    const port = testServer.address().port;
+
+    process.nextTick(() => {
+      // simulate a delayed GET request to the callback with auth code and error
+      // once the tempServer is up and listening,
+      // (delay for the time until user clicks 'Cancel')
+      const _ = axios.get(`http://localhost:${port}/callback`, {
+        params: { state: "testState", error: "testError" },
+      });
+    });
+
+    await expect(listenForAuthCode(testServer)).resolves.toEqual({
+      state: "testState",
+      code: null,
+      error: "testError",
     });
 
     testServer.close();
