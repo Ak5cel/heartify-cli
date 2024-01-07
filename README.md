@@ -25,7 +25,7 @@ Hopefully, it's useful to more people out there with little time and a lot of li
 
 ### No library size limits
 
-There's no (known) limit to the number of songs Heartify can fetch, so bring along your massive libary of 7000 liked songs (or more?)!
+There's no (known) limit to the number of songs Heartify can fetch, so bring along your massive library of 7000 liked songs (or more?)!
 Just be prepared for it to take a bit longer with the measures in place to account for Spotify's rate limits.
 
 
