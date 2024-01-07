@@ -6,6 +6,13 @@
   "bin": {
     "heartify": "./index.js"
   },
+  "files": [
+    "/commands",
+    "/config",
+    "/libs",
+    "/utils",
+    "!/**/__tests__"
+  ],
   "scripts": {
     "test": "jest",
     "test-cov": "jest --coverage"
