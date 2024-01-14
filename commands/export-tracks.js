@@ -15,10 +15,13 @@ const {
   batchSaveAudioFeatures,
   checkTablesExist,
 } = require("../libs/db");
+const pc = require("picocolors");
 
 exports.exportTracks = async (playlistName, options) => {
   if (!checkTablesExist()) {
-    console.log("Database setup incomplete. Please run `heartify init`.");
+    console.log(
+      pc.yellow("Database setup incomplete. Please run `heartify init`.")
+    );
     process.exit(1);
   }
 
@@ -27,10 +30,8 @@ exports.exportTracks = async (playlistName, options) => {
   if (isUpToDate) {
     console.log("Everything up to date.");
   } else {
-    console.log("Clearing previous data");
+    console.log("Changes detected. Updating data.\n");
     clearRecords();
-
-    // fetch liked songs
     await reFetchLikedSongs();
     await fetchGenres();
     await fetchAllAudioFeatures();
@@ -67,15 +68,22 @@ exports.exportTracks = async (playlistName, options) => {
   process.stdout.clearLine();
   process.stdout.cursorTo(0);
   process.stdout.write(`Added ${count} songs. \n`);
-  console.log(`Export done.`);
+  console.log(pc.green("Export complete."));
+
+  const playlistLocation = options.onProfile
+    ? "on your Spotify profile"
+    : "in your Spotify library";
 
   console.log(
-    `Find the new playlist in your Spotify libary, or by searching for the uri: \n\n\t${playlistURI}\n\nin the Spotify desktop client.`
+    `Find the new playlist ${playlistLocation}, or by searching for the uri:`
   );
+  console.log(`\n\n\t${playlistURI}\n\n`);
+  console.log("in the Spotify desktop client.");
 };
 
 const reFetchLikedSongs = async () => {
-  console.log("Fetching Liked songs");
+  const header = "Fetching Liked songs...";
+  process.stdout.write(header);
 
   let count = 0;
   for await (let [savedTrackObj, total] of fetchLikedSongs()) {
@@ -83,20 +91,19 @@ const reFetchLikedSongs = async () => {
 
     count++;
 
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    process.stdout.write(`Fetching [${count}/${total}] songs...`);
+    process.stdout.cursorTo(header.length);
+    process.stdout.clearLine(+1);
+    process.stdout.write(pc.dim(`[${count}/${total}]`));
   }
 
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
-  process.stdout.write(`Fetched ${count} songs.\n`);
-
-  console.log("Done.");
+  process.stdout.cursorTo(header.length);
+  process.stdout.clearLine(+1);
+  console.log(pc.green("Done."));
 };
 
 const fetchGenres = async () => {
-  console.log("Fetching genre data...");
+  const header = "Fetching genre data...";
+  process.stdout.write(header);
 
   let count = 0;
   for await (let artistIDs of getFetchedArtists()) {
@@ -108,18 +115,19 @@ const fetchGenres = async () => {
     batchSaveGenres(genreData);
 
     count += artistIDs.length;
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    process.stdout.write(`Adding genres for [${count}] artists...`);
+    process.stdout.cursorTo(header.length);
+    process.stdout.clearLine(+1);
+    process.stdout.write(pc.dim(`[${count}] artists`));
   }
 
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
-  process.stdout.write(`Done.\n`);
+  process.stdout.cursorTo(header.length);
+  process.stdout.clearLine(+1);
+  process.stdout.write(pc.green(`Done.\n`));
 };
 
 const fetchAllAudioFeatures = async () => {
-  console.log("Fetching audio features...");
+  const header = "Fetching audio features...";
+  process.stdout.write(header);
 
   let count = 0;
   for await (let trackIDs of getFetchedTracks({}, 100)) {
@@ -131,12 +139,12 @@ const fetchAllAudioFeatures = async () => {
     batchSaveAudioFeatures(trackFeatures);
 
     count += trackIDs.length;
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    process.stdout.write(`Fetching audio features for [${count}] songs...`);
+    process.stdout.cursorTo(header.length);
+    process.stdout.clearLine(+1);
+    process.stdout.write(pc.dim(`[${count}] songs`));
   }
 
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
-  process.stdout.write(`Done.\n`);
+  process.stdout.cursorTo(header.length);
+  process.stdout.clearLine(+1);
+  process.stdout.write(pc.green(`Done.\n`));
 };

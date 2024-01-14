@@ -1,8 +1,11 @@
 const { checkTablesExist, getFetchedGenres } = require("../libs/db");
+const pc = require("picocolors");
 
 exports.showGenres = () => {
   if (!checkTablesExist()) {
-    console.log("Database setup incomplete. Please run `heartify init`.");
+    console.log(
+      pc.yellow("Database setup incomplete. Please run `heartify init`.")
+    );
     process.exit(1);
   }
 
