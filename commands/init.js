@@ -1,4 +1,5 @@
 const http = require("http");
+const pc = require("picocolors");
 const {
   generateSpotifyAuthURL,
   listenForAuthCode,
@@ -13,12 +14,13 @@ const {
 } = require("../libs/db");
 
 exports.init = async () => {
-  console.log("Hello! Welcome to heartify 💜");
+  const version = require("../package.json").version;
+  console.log(pc.dim(`Heartify v${version}\n`));
 
   const authURL = generateSpotifyAuthURL();
 
   console.log(
-    "Visit this link to authorize access to your library and complete the setup. These permissions can be revoked at any time from your account settings on Spotify. \n"
+    "Visit this link to authorise access to your library and complete the setup.\nThese permissions can be revoked at any time from your account settings on Spotify. \n"
   );
   console.log(authURL);
 
@@ -34,29 +36,34 @@ exports.init = async () => {
 
   if (!state || state !== process.env.SPOTIFY_CLIENT_STATE) {
     console.log(
-      "Error: there seems to be a state mismatch. This could happen if the link expires, or if Spotify encounters an error. Please try again later."
+      pc.red(
+        "Error: there seems to be a state mismatch. This could happen if the link expires, or if Spotify encounters an error. Please try again later."
+      )
     );
-    return;
+    process.exit(1);
   } else if (error) {
-    console.log("Hmm.. something's gone wrong");
-    console.log(`ERROR: ${error}`);
-    console.log(
-      "We received an error from Spotify. This happens if the user declines permissions or if Spotify encounters an error. Please try again later."
-    );
-    return;
+    console.log(pc.bgRed(`ERROR: ${error}`));
+    if (error === "access_denied") {
+      console.log(pc.red("Init failed - permissions denied."));
+    } else {
+      console.log(
+        pc.red("We received an error from Spotify. Please try again later.")
+      );
+    }
+    process.exit(1);
   }
 
   console.log(
-    "\nReceived permissions, you can now safely close the browser tab/window..."
+    "\nReceived permissions, you can now safely close the browser tab/window."
   );
 
-  console.log("Completing authentication...");
+  process.stdout.write("Completing authentication...");
 
   const { accessToken, refreshToken } = await exchangeCodeForTokens(code);
 
-  console.log("Done.");
+  process.stdout.write(pc.green("Done.\n"));
 
-  console.log("Initialising local database...");
+  process.stdout.write("Initialising local database...");
   dropAllTables();
   setupDB();
   createUserWithTokens(accessToken, refreshToken);
@@ -64,5 +71,10 @@ exports.init = async () => {
   const { id: spotify_id, display_name } = await fetchUserProfile();
   saveUserProfile(spotify_id, display_name);
 
-  console.log("Done.");
+  console.log(pc.green("Done.\n"));
+
+  console.log(pc.green("Init complete.\n"));
+  console.log(
+    `Run \`heartify export --help\` to see how to make your first playlist!`
+  );
 };
