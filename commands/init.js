@@ -12,6 +12,11 @@ const {
   createUserWithTokens,
   dropAllTables,
 } = require("../libs/db");
+const {
+  fetchAllLikedSongs,
+  fetchGenres,
+  fetchAllAudioFeatures,
+} = require("./common");
 
 exports.init = async () => {
   const version = require("../package.json").version;
@@ -72,6 +77,10 @@ exports.init = async () => {
   saveUserProfile(spotify_id, display_name);
 
   console.log(pc.green("Done.\n"));
+
+  await fetchAllLikedSongs();
+  await fetchGenres();
+  await fetchAllAudioFeatures();
 
   console.log(pc.green("Init complete.\n"));
   console.log(

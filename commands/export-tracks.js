@@ -1,20 +1,15 @@
+const { createPlaylist, addTracksToPlaylist } = require("../libs/api");
 const {
-  fetchLikedSongs,
-  createPlaylist,
-  addTracksToPlaylist,
-  fetchArtists,
-  fetchAudioFeatures,
-} = require("../libs/api");
-const {
-  saveTrack,
   clearRecords,
   checkIsDBUpToDate,
   getFetchedTracks,
-  batchSaveGenres,
-  getFetchedArtists,
-  batchSaveAudioFeatures,
   checkTablesExist,
 } = require("../libs/db");
+const {
+  fetchAllLikedSongs,
+  fetchGenres,
+  fetchAllAudioFeatures,
+} = require("./common");
 const pc = require("picocolors");
 
 exports.exportTracks = async (playlistName, options) => {
@@ -32,7 +27,7 @@ exports.exportTracks = async (playlistName, options) => {
   } else {
     console.log("Changes detected. Updating data.\n");
     clearRecords();
-    await reFetchLikedSongs();
+    await fetchAllLikedSongs();
     await fetchGenres();
     await fetchAllAudioFeatures();
   }
@@ -79,72 +74,4 @@ exports.exportTracks = async (playlistName, options) => {
   );
   console.log(`\n\n\t${playlistURI}\n\n`);
   console.log("in the Spotify desktop client.");
-};
-
-const reFetchLikedSongs = async () => {
-  const header = "Fetching Liked songs...";
-  process.stdout.write(header);
-
-  let count = 0;
-  for await (let [savedTrackObj, total] of fetchLikedSongs()) {
-    saveTrack(savedTrackObj);
-
-    count++;
-
-    process.stdout.cursorTo(header.length);
-    process.stdout.clearLine(+1);
-    process.stdout.write(pc.dim(`[${count}/${total}]`));
-  }
-
-  process.stdout.cursorTo(header.length);
-  process.stdout.clearLine(+1);
-  console.log(pc.green("Done."));
-};
-
-const fetchGenres = async () => {
-  const header = "Fetching genre data...";
-  process.stdout.write(header);
-
-  let count = 0;
-  for await (let artistIDs of getFetchedArtists()) {
-    const artists = await fetchArtists(artistIDs);
-    const genreData = artists.map((artist) => {
-      return { artistID: artist.id, genres: artist.genres };
-    });
-
-    batchSaveGenres(genreData);
-
-    count += artistIDs.length;
-    process.stdout.cursorTo(header.length);
-    process.stdout.clearLine(+1);
-    process.stdout.write(pc.dim(`[${count}] artists`));
-  }
-
-  process.stdout.cursorTo(header.length);
-  process.stdout.clearLine(+1);
-  process.stdout.write(pc.green(`Done.\n`));
-};
-
-const fetchAllAudioFeatures = async () => {
-  const header = "Fetching audio features...";
-  process.stdout.write(header);
-
-  let count = 0;
-  for await (let trackIDs of getFetchedTracks({}, 100)) {
-    const audioFeatures = await fetchAudioFeatures(trackIDs);
-    const trackFeatures = audioFeatures.map((featuresObj) => {
-      return { trackID: featuresObj.id, audioFeatures: featuresObj };
-    });
-
-    batchSaveAudioFeatures(trackFeatures);
-
-    count += trackIDs.length;
-    process.stdout.cursorTo(header.length);
-    process.stdout.clearLine(+1);
-    process.stdout.write(pc.dim(`[${count}] songs`));
-  }
-
-  process.stdout.cursorTo(header.length);
-  process.stdout.clearLine(+1);
-  process.stdout.write(pc.green(`Done.\n`));
 };

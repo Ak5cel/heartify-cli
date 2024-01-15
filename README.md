@@ -1,8 +1,7 @@
 # heartify-cli
 
-A CLI tool to export and filter out your Spotify liked songs into playlists. 
+A CLI tool to export and filter out your Spotify liked songs into playlists.
 With support for filters like ranges of date added, release date, genres, audio features, and more.
-
 
 ## What does it solve?
 
@@ -11,23 +10,22 @@ Hopefully, it's useful to more people out there with little time and a lot of li
 
 ### What you can do
 
-  ✔️ Export them to a playlist - you can now share your liked songs!
-  
-  ✔️ Filter by the year you liked them - make a 'My Top Songs 2023' playlist, for example
-  
-  ✔️ Filter by genre(s) to make genre-mixes out of your liked songs
-  
-  ✔️ Make monthly playlists - no more adding songs manually to monthly playlists, simply filter by ranges of dates added
-  
-  ✔️ Decade mixes - filter by release date
-  
-  ✔️ Filter by audio features - make a workout playlist of songs in a certain bpm range, for example
+✔️ Export them to a playlist - you can now share your liked songs!
+
+✔️ Filter by the year you liked them - make a 'My Top Songs 2023' playlist, for example
+
+✔️ Filter by genre(s) to make genre-mixes out of your liked songs
+
+✔️ Make monthly playlists - no more adding songs manually to monthly playlists, simply filter by ranges of dates added
+
+✔️ Decade mixes - filter by release date
+
+✔️ Filter by audio features - make a workout playlist of songs in a certain bpm range, for example
 
 ### No library size limits
 
 There's no (known) limit to the number of songs Heartify can fetch, so bring along your massive library of 7000 liked songs (or more?)!
 Just be prepared for it to take a bit longer with the measures in place to account for Spotify's rate limits.
-
 
 ## Getting Started
 
@@ -41,7 +39,7 @@ npm install -g heartify-cli
 
 ### Authorisation
 
-Run the following command from any directory, all data is stored locally where Heartify is installed. 
+Run the following command from any directory, all data is stored locally where Heartify is installed.
 Then follow the instructions to authorise access to your Spotify library.
 
 ```sh
@@ -49,8 +47,8 @@ Then follow the instructions to authorise access to your Spotify library.
 
 ```
 
-This command needs to be run just once, and you're logged in until you revoke permissions from your account page, 
-logout, or until Spotify automatically revokes permissions from time-to-time (in which case, run `heartify init` again). 
+This command needs to be run just once, and you're logged in until you revoke permissions from your account page,
+logout, or until Spotify automatically revokes permissions from time-to-time (in which case, run `heartify init` again).
 Heartify uses the OAuth 2.0 Authorization Code with PKCE flow, and refreshes the access token automatically until it's revoked.
 
 ### Basic Examples
@@ -84,11 +82,6 @@ Heartify uses the OAuth 2.0 Authorization Code with PKCE flow, and refreshes the
    heartify show-genres
 
    ```
-
-    > Note:
-    > As of now, you need to have run at least one `export` command before running `show-genres` as it needs to fetch the
-    > liked songs first while exporting to identify the genres. This will be fixed in a future update.
-   
 
    Then pick a genre and filter (replace '\<genre name\>'):
 
@@ -160,12 +153,11 @@ Heartify uses the OAuth 2.0 Authorization Code with PKCE flow, and refreshes the
 
    ```
 
-
 ## Detailed Docs (TODO)
 
 ### `--filter`
 
-Filters are of the form `field=value` and accept any field from the list of supported fields below. 
+Filters are of the form `field=value` and accept any field from the list of supported fields below.
 
 The value can be either individual values like in `genre=disco` and `time_signature=4`, or ranges like
 in `tempo=[100,120]` (only DateTime and Number fields accept ranges at the time of writing)
@@ -209,7 +201,7 @@ Filters for different fields are joined by AND
 
 ```
 
-Filters do not need to be wrapped in quotes as long as they do not contain ANY spaces. 
+Filters do not need to be wrapped in quotes as long as they do not contain ANY spaces.
 Wrap them in single/double quotes when they contain whitespace.
 
 ```sh
@@ -231,7 +223,7 @@ Wrap them in single/double quotes when they contain whitespace.
 ```
 
 ### String fields
-    
+
 - `artist`
 - `genre`
 
@@ -249,7 +241,7 @@ These fields correspond to those returned by the Spotify Web API. The descriptio
 which can be found in the [Spotify Web Api docs for Audio Features](https://developer.spotify.com/documentation/web-api/reference/get-audio-features).
 
 | field              | description                                                                                                                                                                                                                                | range                 |
-|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------|
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
 | `danceability`     | How suitable a track is for dancing based on <br>a combination of musical elements including tempo, <br>rhythm stability, beat strength,and overall regularity                                                                             | 0.0 to 1.0<br>(float) |
 | `energy`           | Represents a perceptual measure of intensity <br>and activity                                                                                                                                                                              | 0.0 to 1.0<br>(float) |
 | `key`              | The key the track is in. <br>Integers map to pitches using standard Pitch Class <br>notation. E.g. 0 = C, 1 = C♯/D♭, 2 = D, and so on. <br>If no key was detected, the value is -1.                                                        | -1 to 11<br>(integer) |
