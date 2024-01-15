@@ -58,10 +58,8 @@ class RootApiService {
             const delay = err.response.headers["retry-after"] | 1;
             const delay_ms = delay * 1000;
 
-            console.log("waiting");
             const delayRetry = new Promise((resolve) => {
               setTimeout(() => {
-                console.log("retrying the request", originalConfig.url);
                 resolve();
               }, delay_ms);
             });
@@ -71,6 +69,13 @@ class RootApiService {
 
           if (err.response.status === 403 && err.response.data) {
             return Promise.reject(err.response.data);
+          }
+
+          if (err.response.status === 500) {
+            return Promise.reject({
+              status: 500,
+              msg: "Spotify Web API error: 500 - Internal Server Error. Please try again later.",
+            });
           }
         }
 
