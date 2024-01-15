@@ -1,3 +1,5 @@
+<!--- This is the short README for npm, see the full README in .github/ -->
+
 # heartify-cli
 
 A CLI tool to export and filter out your Spotify liked songs into playlists.
@@ -5,8 +7,12 @@ With support for filters like ranges of date added, release date, genres, audio 
 
 ## What does it solve?
 
-Around 2500 Liked songs in, I needed a way to organise the chaos without having to move away from 'liking' any more songs.
-Hopefully, it's useful to more people out there with little time and a lot of liked songs :)
+The Liked Songs list on Spotify can quickly grow into chaos the more you use it. 
+As time goes by, it becomes increasingly harder to find songs to fit the moment, while keeping all of your liked songs in one place. It's also easier to forget your older songs as Spotify's shuffle keeps playing the same 50 songs over and over again. And sometimes, it's just nicer if there was a way to keep adding songs, while also being able to filter them out occasionally into playlists of just your favourites that fit the mood. 
+
+That's where Heartify comes in, so you can create fine-tuned playlists with just the songs you like, and share them 🎉 
+
+One step from chaos -> organised chaos 🗃️
 
 ### Features
 
@@ -60,7 +66,7 @@ heartify export 'My <genre name> mix' --filter 'genre=<genre name>'
 # make a multi-genre mix
 heartify export 'My multi-genre mix' --filter 'genre=<genre name>' 'genre=<another genre name>'
 
-# filter by properties of the track - like release date, audio features (tempo, key, etc), and more
+# filter by properties of the track - like release date, audio features (tempo, key, etc)
 heartify export 'Liked Songs, 100-120bpm' --filter tempo=[100,120]
 
 ```
