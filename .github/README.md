@@ -5,8 +5,11 @@ With support for filters like ranges of date added, release date, genres, audio 
 
 ## What does it solve?
 
-Around 2500 Liked songs in, I needed a way to organise the chaos without having to move away from 'liking' any more songs.
-Hopefully, it's useful to more people out there with little time and a lot of liked songs :)
+The Liked Songs list on Spotify can quickly grow into chaos the more you use it. As time goes by, it becomes increasingly harder to find songs to fit the moment, while keeping all of your liked songs in one place. It's also easier to forget your older songs if Spotify's shuffle keeps playing the same 50 songs over and over again. And sometimes, it's just nicer if there was a way to keep adding songs, while also being able to filter them out occasionally into playlists of just your favourites that fit the mood.
+
+That's where Heartify comes in, so you can create fine-tuned playlists with just the songs you like, and share them 🎉
+
+One step from chaos -> organised chaos 🗃️
 
 ### What you can do
 
@@ -26,6 +29,12 @@ Hopefully, it's useful to more people out there with little time and a lot of li
 
 There's no (known) limit to the number of songs Heartify can fetch, so bring along your massive library of 7000 liked songs (or more?)!
 Just be prepared for it to take a bit longer with the measures in place to account for Spotify's rate limits.
+
+### Fully local
+
+Heartify collects no data. 
+All data is stored locally on your device where heartify is installed, and can be deleted by running `heartify logout`. 
+You can also revoke access at any time from your Spotify account page at Spotify Account > Security and privacy > Manage apps.
 
 ## Getting Started
 
