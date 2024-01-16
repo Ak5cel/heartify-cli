@@ -267,6 +267,19 @@ which can be found in the [Spotify Web Api docs for Audio Features](https://deve
 
 ---
 
+## Roadmap
+
+A few features I plan on adding in future updates 🎯
+
+- Options to add songs/update an existing playlist instead of creating a new playlist on export
+- Command to like all songs from a playlist - like an import rather than an export.
+  - Could come in handy if your songs got unliked for some reason one day but you had them backed up in another playlist
+  - Also useful if migrating to Spotify and you used another service to have your favourites exported to Spotify playlists
+- More export formats - csv, txt, JSON
+- A query command to see search results in a tabulated format before running an export
+- Support for regular expressions in string filters
+
+
 ## Feedback, suggestions, and bug reports welcome! 👐
 
 This is a small project I've been making on the side as I'm learning JS.
