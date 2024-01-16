@@ -12,6 +12,8 @@ const { parseFilters } = require("./utils/filter-parsers");
 const { logout } = require("./commands/logout");
 const { showGenres } = require("./commands/show-genres");
 
+program.usage("[command] [options]");
+
 program
   .command("init")
   .description(
@@ -21,7 +23,8 @@ program
 
 program
   .command("export")
-  .description("export liked songs to a new public/private playlist")
+  .usage("<playlist_name> [options]")
+  .description("Export liked songs to a new playlist")
   .argument(
     "<playlist_name>",
     "name of the new playlist. If it contains multiple words, wrap in single/double quotes like 'my playlist name'"
@@ -48,13 +51,68 @@ program
       .conflicts(["addedFrom", "addedTo"])
       .argParser(parseYear)
   )
-  .option("--filter <name=value...>", "specify filters", parseFilters, {})
+  .option(
+    "--filter <field=value...>",
+    `specify additional filters based on features of the track
+
+  More on filters
+  ===============
+  - Value types
+    1. Individual values 
+      - 'field=value1'
+      - accepted by all filter fields
+    2. Ranges
+      - 'field=[start,end]' or 'field=[start,]' or 'field=[,end]'
+      - accepted by DateTime and Number fields only
+
+  - String fields: 
+      - Fields: artist, genre
+      - Accepted value types: individual values only
+  - Datetime fields:
+      - Fields: release_date
+      - Accepted value types: individual values and ranges
+      - Valid formats - YYYY-MM-DD, YYYYMMDD. YYYY (parsed as YYYY-01-01)
+  - Number fields:
+      - Fields: danceability, energy, key, loudness, mode, speechiness, acousticness,
+        instrumentalness, liveness, valence, tempo, duration_ms, time_signature
+      - Accepted value types: individual values and ranges
+
+  `,
+    parseFilters,
+    {}
+  )
+  .addHelpText(
+    "after",
+    `
+Example calls:
+  # export all iked songs to a playlist, add to profile (-p)
+  $ heartify export 'My Liked Songs' -p
+
+  # export just the songs liked in 2023
+  $ heartify export 'Liked Songs 2023' -Y 2023
+
+  # or the songs liked in any range of time
+  $ heartify export 'Liked Songs, November 2023' -f 2023-11-01 -t 2023-11-30
+
+  # see all genres identified
+  $ heartify show-genres
+
+  # make a genre-mix (replace <genre name> with a genre of your choice)
+  $ heartify export 'My <genre name> mix' --filter 'genre=<genre name>'
+
+  # make a multi-genre mix
+  $ heartify export 'My multi-genre mix' --filter 'genre=<genre name>' 'genre=<another genre name>'
+
+  # filter by properties of the track - like release date, audio features (tempo, key, etc)
+  $ heartify export 'Liked Songs, 100-120bpm' --filter tempo=[100,120]
+  `
+  )
   .action(exportTracks);
 
 program
   .command("show-genres")
   .description(
-    "show all genres detected in the liked songs in a tabular format. Use these to filter by genre when using the `--filter` option"
+    "Show all genres detected in the liked songs in a tabular format. Use these to filter by genre when using the `--filter` option"
   )
   .action(showGenres);
 
