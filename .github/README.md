@@ -3,19 +3,18 @@
 A CLI tool to export and filter out your Spotify liked songs into playlists.
 With support for filters like ranges of date added, release date, genres, audio features, and more.
 
-## What does it solve?
+## Motivation
 
-The Liked Songs list on Spotify can quickly grow into chaos the more you use it. As time goes by, it becomes increasingly harder to find songs to fit the moment, while keeping all of your liked songs in one place. It's also easier to forget your older songs if Spotify's shuffle keeps playing the same 50 songs over and over again. And sometimes, it's just nicer if there was a way to keep adding songs, while also being able to filter them out occasionally into playlists of just your favourites that fit the mood.
+The "Liked Songs" list on Spotify can quickly grow into chaos the more you use it. Over time, it becomes increasingly harder to find songs to fit the moment, while keeping all of your liked songs in one place. It's also easier to forget your older songs if only a few songs make it to the Spotify shuffle. It would be handy if there was a way to keep "liking" songs, while also being able to filter them out into playlists of just your favourites without having to do it manually.
 
-That's where Heartify comes in, so you can create fine-tuned playlists with just the songs you like, and share them 🎉
-
+With this little tool, you can create fine-tuned playlists with just the songs you like, and share them 🎉 
 One step from chaos -> organised chaos 🗃️
 
-### What you can do
+### Features
 
-✔️ Export them to a playlist - you can now share your liked songs!
+✔️ Export to a playlist to share your liked songs
 
-✔️ Filter by the year you liked them - make a 'My Top Songs 2023' playlist, for example
+✔️ Filter by the year you liked the song - make a 'My Top Songs 2023' playlist, for example
 
 ✔️ Filter by genre(s) to make genre-mixes out of your liked songs
 
@@ -28,7 +27,7 @@ One step from chaos -> organised chaos 🗃️
 ### No library size limits
 
 There's no (known) limit to the number of songs Heartify can fetch, so bring along your massive library of 7000 liked songs (or more?)!
-Just be prepared for it to take a bit longer with the measures in place to account for Spotify's rate limits.
+It would just take a bit longer with the measures in place to account for Spotify's rate limits.
 
 ### Fully local
 
@@ -36,15 +35,13 @@ Heartify collects no data.
 All data is stored locally on your device where heartify is installed, and can be deleted by running `heartify logout`. 
 You can also revoke access at any time from your Spotify account page at Spotify Account > Security and privacy > Manage apps.
 
-## Getting Started
-
-### Installation
+## Installation
 
 ```sh
 npm install -g heartify-cli
 ```
 
-### Authorisation
+## Authorisation
 
 Run the following command from any directory, all data is stored locally where Heartify is installed.
 Then follow the instructions to authorise access to your Spotify library.
@@ -58,107 +55,119 @@ This command needs to be run just once, and you're logged in until you revoke pe
 logout, or until Spotify automatically revokes permissions from time-to-time (in which case, run `heartify init` again).
 Heartify uses the OAuth 2.0 Authorization Code with PKCE flow, and refreshes the access token automatically until it's revoked.
 
-### Basic Examples
+## Basic Examples
 
-1. Export all liked songs to a playlist (replace 'My Liked Songs' for your playlist name, wrapped in quotes if it contains spaces)
+### Export All
 
-   ```sh
-    heartify export 'My Liked Songs'
+Export all liked songs to a playlist (replace 'My Liked Songs' for your playlist name, wrapped in quotes if it contains spaces)
 
-   ```
+```sh
+heartify export 'My Liked Songs'
 
-   New playlists are not displayed on your profile by default. To display it on your profile, use the `--on-profile` flag or its short form `-p`
+```
 
-   ```sh
-   heartify export 'My Liked Songs' -p
+New playlists are not displayed on your profile by default. To display it on your profile, use the `--on-profile` flag or its short form `-p`
 
-   ```
+```sh
+heartify export 'My Liked Songs' -p
 
-1. Export your liked songs from a specific year (2023 in the example). You can use `--added-from` or `-f`
-   and `--added-to` or `-t`, but there's also a convenience option `--year` or `-Y` available, used here:
+```
 
-   ```sh
-   heartify export 'Liked Songs 2023' -Y 2023
+### Filter by year added
 
-   ```
+Export your liked songs from a specific year (2023 in the example). You can use `--added-from` or `-f`
+and `--added-to` or `-t` ([docs](#custom-range-of-dates-added)), but there's also a convenience option `--year` or `-Y` available, used here:
 
-1. Filter by genre: There are several filters available, and one of them is `genre`.
-   To see all the genres detected in your liked songs that you can filter by, run
+```sh
+heartify export 'Liked Songs 2023' -Y 2023
 
-   ```sh
-   heartify show-genres
+```
 
-   ```
+### Filter by genre
 
-   Then pick a genre and filter (replace '\<genre name\>'):
+There are several filters available, and one of them is `genre`.
+To see all the genres detected in your liked songs that you can filter by, run
 
-   ```sh
-   heartify export 'My <genre name> mix' --filter 'genre=<genre name>'
+```sh
+heartify show-genres
 
-   ```
+```
 
-   You can also filter by multiple genres:
+Then pick a genre and filter (replace '\<genre name\>'):
 
-   ```sh
-   heartify export 'My multi-genre mix' --filter 'genre=<genre name>' 'genre=<another genre name>'
+```sh
+heartify export 'My <genre name> mix' --filter 'genre=<genre name>'
 
-   ```
+```
 
-   If genre names contain spaces or special characters, either wrap it in quotes, or wrap the entire field-value pair in quotes.
-   For example, this command would make (a rather interesting) playlist out of songs which fall into at least one of
-   the following genres: 'disco', 'conscious hip hop', 'k-indie', and 'escape room'
+You can also filter by multiple genres:
 
-   ```sh
-   heartify export 'My multi-genre mix' --filter genre=disco 'genre=conscious hip hop' genre='k-indie' genre='escape room'
+```sh
+heartify export 'My multi-genre mix' --filter 'genre=<genre name>' 'genre=<another genre name>'
 
-   ```
+```
 
-1. Filter by custom range of date added using the `--added-from` or `-f` option, the `--added-to` or `-t` option, or both
+If genre names contain spaces or special characters, either wrap it in quotes, or wrap the entire field-value pair in quotes.
+For example, this command would make (a rather interesting) playlist out of songs which fall into at least one of
+the following genres: 'disco', 'conscious hip hop', 'k-indie', and 'escape room'
 
-   ```sh
-   heartify export 'Liked Songs, November 2023' -f 2023-11-01 -t 2023-11-30
+```sh
+heartify export 'My multi-genre mix' --filter genre=disco 'genre=conscious hip hop' genre='k-indie' genre='escape room'
 
-   ```
+```
 
-   ```sh
-   heartify export 'Liked Songs from July 1st 2023 onwards' -f 2023-07-01
+### Custom range of dates added
 
-   ```
+Filter by custom range of date added using the `--added-from` or `-f` option, the `--added-to` or `-t` option, or both
 
-   Some things to keep in mind about the dates:
+```sh
+heartify export 'Liked Songs, November 2023' -f 2023-11-01 -t 2023-11-30
 
-   - Dates for the start of the range (the 'from' values) are converted to the timestamp at midnight at the start of the day
-   - Dates for the end of the range (the 'to' values) are converted to the timestamp at the last second before midnight at the end of the day
-   - Dates are taken with reference to the user's current time zone (machine time zone). They're internally converted to UTC, but respect time zones.
+```
 
-   Valid date formats include:
+```sh
+heartify export 'Liked Songs from July 1st 2023 onwards' -f 2023-07-01
 
-   - `YYYYMMDD`: 20230101, 20230730
-   - `YYYY-MM-DD`: 2023-01-01, 2023-07-30
-   - `YYYY`: 2023, 2022 (NOTE: this is converted to midnight at the start of the year if it's a 'from' value, and the timestamp
-     at the last second before midnight of January 1st if it's a 'to' value)
+```
 
-1. Filter by other features of the tracks, like date released, key, or tempo (see the list of supported features [here](#string-fields))
+Some things to keep in mind about the dates:
 
-   ```sh
-     heartify export 'Liked Songs, 120bpm' --filter tempo=120
+ - Dates for the start of the range (the 'from' values) are converted to the timestamp at midnight at the start of the day
+ - Dates for the end of the range (the 'to' values) are converted to the timestamp at the last second before midnight at the end of the day
+ - Dates are taken with reference to the user's current time zone (machine time zone). They're internally converted to UTC, but respect time zones.
 
-   ```
+ Valid date formats include:
 
-1. Filter by ranges: DateTime filters and Number filters (TODO: link) support ranges. Ranges are written as `field=[from, to]`.
-   Either the 'from' or the 'to' value can be omitted for a range unbounded on one side
+ - `YYYYMMDD`: 20230101, 20230730
+ - `YYYY-MM-DD`: 2023-01-01, 2023-07-30
+ - `YYYY`: 2023, 2022 (NOTE: this is converted to midnight at the start of the year if it's a 'from' value, and the timestamp
+   at the last second before midnight of January 1st if it's a 'to' value)
 
-   ```sh
-     heartify export 'Liked Songs, 100-120bpm' --filter tempo=[100,120]
+### Filter by audio features
 
-   ```
+Filter by other features of the tracks, like date released, key, or tempo (see the list of supported features [here](#string-fields))
 
-1. Combine options and filters
+```sh
+ heartify export 'Liked Songs, 120bpm' --filter tempo=120
 
-   ```sh
-     heartify export 'Liked Songs 2023, 100-120bpm, danceable' -Y 2023 --filter tempo=[100,120] danceability=[0.7,]
+```
 
-   ```
+### Ranges
+
+DateTime filters and Number filters ([docs](#datetime-fields)) support ranges. Ranges are written as `field=[from,to]`.
+Either the 'from' or the 'to' value can be omitted for a range unbounded on one side
+
+```sh
+ heartify export 'Liked Songs, 100-120bpm' --filter tempo=[100,120]
+
+```
+
+### Combine options and filters
+
+```sh
+ heartify export 'Liked Songs 2023, 100-120bpm, danceable' -Y 2023 --filter tempo=[100,120] danceability=[0.7,]
+
+```
 
 ## Detailed Docs (TODO)
 
