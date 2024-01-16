@@ -40,8 +40,6 @@ You can also revoke access at any time from your Spotify account page at Spotify
 
 ### Installation
 
-Heartify is currently a work in progress, but you can install it by running:
-
 ```sh
 npm install -g heartify-cli
 ```
